@@ -1,22 +1,22 @@
 ﻿namespace Tradibit.Common.DTO;
 
-public class Pair
+public class Pair  : IEquatable<Pair>
 {
     public static string SEPARATOR = "";
 
-    public Currency BaseCurrency { get; set; }
-    public Currency QuoteCurrency { get; set; }
+    private readonly Currency _baseCurrency;
+    private readonly Currency _quoteCurrency;
         
     public Pair(string baseCurrency, string quoteCurrency) : 
         this(new Currency(baseCurrency), new Currency(quoteCurrency)) { }
 
-    public Pair(Currency baseCurrency, Currency quotecurrency)
+    public Pair(Currency baseCurrency, Currency quoteCurrency)
     {
-        BaseCurrency = baseCurrency;
-        QuoteCurrency = quotecurrency;
+        _baseCurrency = baseCurrency;
+        _quoteCurrency = quoteCurrency;
     }
 
-    public override string ToString() => $"{BaseCurrency}{SEPARATOR}{QuoteCurrency}";
+    public override string ToString() => $"{_baseCurrency}{SEPARATOR}{_quoteCurrency}";
 
     public static Pair ParseOrDefault(string input) 
     {
@@ -28,6 +28,36 @@ public class Pair
             return new Pair(Currency.BTC, Currency.USDT);
         }
         return new Pair(strs[0], strs[1]);
+    }
+    
+    public static bool operator ==(Pair pair1, Pair pair2)
+    {
+        if (pair1 is null)
+            return pair2 is null;
+        
+        return pair1.Equals(pair2);
+    }
+
+    public static bool operator !=(Pair pair1, Pair pair2) =>
+        !(pair1 == pair2);
+    
+    public bool Equals(Pair other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return Equals(_baseCurrency, other._baseCurrency) && Equals(_quoteCurrency, other._quoteCurrency);
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (ReferenceEquals(null, obj)) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        return obj.GetType() == GetType() && Equals((Pair)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(_baseCurrency, _quoteCurrency);
     }
 }
 
@@ -44,8 +74,19 @@ public class Currency : IEquatable<Currency>
 
     public override string ToString() => Value;
 
+    public static bool operator ==(Currency currency1, Currency currency2)
+    {
+        if (currency1 is null)
+            return currency2 is null;
+        
+        return currency1.Equals(currency2);
+    }
+
+    public static bool operator !=(Currency currency1, Currency currency2) =>
+        !(currency1 == currency2);
+
     public bool Equals(Currency other) =>
-        Value == other.Value;
+        Value.Equals(other?.Value);
 
     public override bool Equals(object obj) =>
         Equals((Currency)obj);

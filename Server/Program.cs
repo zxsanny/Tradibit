@@ -1,6 +1,10 @@
-using Tradibit.Api.Providers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Tradibit.Api.Auth;
+using Tradibit.Api.Services;
+using Tradibit.Api.Services.Candles;
 using Tradibit.Common.DTO;
 using Tradibit.Common.Extensions;
+using Tradibit.Common.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,14 +15,30 @@ builder.Services.AddRazorPages();
 
 builder.Services
     .ConfigSection<MainTradingSettings>(builder.Configuration)
-    .AddSingleton<RealtimeCandlesProvider>()
-    .AddSingleton<HistoryCandlesProvider>()
+    .AddSingleton<RealtimeCandlesService>()
+    .AddSingleton<HistoryCandlesService>()
     .AddScoped<CandlesProviderResolver>(sp => resolverEnum => resolverEnum switch
     {
-        CandlesResolverEnum.Realtime => sp.GetService<RealtimeCandlesProvider>(),
-        CandlesResolverEnum.History => sp.GetService<HistoryCandlesProvider>(),
+        CandlesResolverEnum.Realtime => sp.GetService<RealtimeCandlesService>(),
+        CandlesResolverEnum.History => sp.GetService<HistoryCandlesService>(),
         _ => throw new ArgumentOutOfRangeException(nameof(resolverEnum), resolverEnum, null)
-    });
+    })
+    .AddScoped<IUserBrokerService, UserBrokerService>()
+    .AddScoped<ICoinsService, CoinsService>()
+    .AddSingleton<ICurrentUserProvider, CurrentUserProvider>();;
+
+builder.Services.AddAuthentication(o =>
+{
+    o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(o =>
+{
+    o.SecurityTokenValidators.Clear();
+    o.SecurityTokenValidators.Add(new GoogleTokenValidator());
+});
+    
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -45,7 +65,5 @@ app.UseRouting();
 app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
-
-await app.Services.GetService<RealtimeCandlesProvider>()!.Start();
 
 app.Run();

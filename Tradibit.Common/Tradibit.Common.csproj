@@ -17,14 +17,11 @@
 
     <ItemGroup>
       <PackageReference Include="Binance.Net" Version="8.2.0" />
+      <PackageReference Include="MediatR.Contracts" Version="1.0.1" />
       <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
       <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
       <PackageReference Include="Skender.Stock.Indicators" Version="2.4.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="DTO\Candles" />
     </ItemGroup>
 
 </Project>
