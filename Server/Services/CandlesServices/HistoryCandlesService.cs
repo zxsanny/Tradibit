@@ -1,42 +1,55 @@
+using Binance.Net.Clients;
+using Binance.Net.Enums;
+using MediatR;
 using Skender.Stock.Indicators;
-using Tradibit.Api.Services.Binance;
 using Tradibit.Common;
 using Tradibit.Common.DTO;
+using Tradibit.Common.DTO.Events;
 using Tradibit.Common.Extensions;
 using Tradibit.Common.Interfaces;
 
-namespace Tradibit.Api.Services.Candles;
+namespace Tradibit.Api.Services.CandlesServices;
 
-public class HistoryCandlesService : BaseBinanceService, ICandlesService
+public class HistoryCandlesService : 
+    INotificationHandler<UserLoginEvent>,
+    IRequestHandler<ReplyHistoryEvent>
 {
-    private Func<Pair,Quote,Dictionary<IndicatorEnum, decimal?>, Task> _handler;
+    private readonly ILogger<HistoryCandlesService> _logger;
+    private readonly ICurrentUserProvider _currentUserProvider;
     private readonly ICoinsService _coinsService;
+    private BinanceClient _client;
     
     private readonly Dictionary<PairIntervalKey, List<Quote>> _quotes = new();
     private readonly Dictionary<PairIntervalKey, Dictionary<IndicatorEnum, List<decimal?>>> _indicators = new();
-    
-    public HistoryCandlesService(ILogger<HistoryCandlesService> logger, ICurrentUserProvider currentUserProvider, ICoinsService coinsService)
-        : base(logger, currentUserProvider)
+    private readonly IMediator _mediator;
+
+    public HistoryCandlesService(ILogger<HistoryCandlesService> logger, ICurrentUserProvider currentUserProvider,
+        ICoinsService coinsService, 
+        IMediator mediator)
     {
+        _logger = logger;
+        _currentUserProvider = currentUserProvider;
         _coinsService = coinsService;
+        _mediator = mediator;
     }
-
-    public async Task SubscribeKlineHandler(Func<Pair, Quote, Dictionary<IndicatorEnum, decimal?>, Task> handler)
-    {
-        _handler = handler;
-    }
-
     
-    public async Task StartProcessHistory(TimeSpan historySpan, CancellationToken cancellationToken = default)
+    public async Task Handle(UserLoginEvent notification, CancellationToken cancellationToken)
     {
-        var pairs = await _coinsService.GetMostCapitalisedPairs(cancellationToken);
+        _client ??= _currentUserProvider.GetClient();
+    }
+    
+    public async Task<Unit> Handle(ReplyHistoryEvent request, CancellationToken cancellationToken)
+    {
+        var pairs = request.Pairs ?? await _coinsService.GetMostCapitalisedPairs(cancellationToken);
+        var intervals = request.Intervals ?? Constants.DefaultIntervals;
+
         foreach (var pair in pairs)
         {
-            foreach (var interval in Constants.DefaultIntervals)
+            foreach (var interval in intervals)
             {
                 var candlesKey = new PairIntervalKey(pair, interval);
-                _quotes[candlesKey] = (await Client.SpotApi.ExchangeData.GetKlinesAsync(pair.ToString(), interval, 
-                    startTime: DateTime.UtcNow.Subtract(historySpan), ct: cancellationToken))
+                _quotes[candlesKey] = (await _client.SpotApi.ExchangeData.GetKlinesAsync(pair.ToString(), interval, 
+                    startTime: DateTime.UtcNow.Subtract(request.HistorySpan), ct: cancellationToken))
                     .Data.Select(x => x.ToQuote()).ToList();
                 SetIndicators(candlesKey);
             }
@@ -50,8 +63,11 @@ public class HistoryCandlesService : BaseBinanceService, ICandlesService
                 {
                     var candlesKey = new PairIntervalKey(pair, interval);
                     var indicators = _indicators[candlesKey].ToDictionary(x => x.Key, x => x.Value[c]);
-                    _handler?.Invoke(pair, _quotes[candlesKey][c], indicators);
+
+                    var quote = _quotes[candlesKey][c];
+                    await _mediator.Send(new KlineUpdateEvent(pair, quote, indicators, true), cancellationToken);
                 }
+        return Unit.Value;
     }
         
     private void SetIndicators(PairIntervalKey pairIntervalKey)

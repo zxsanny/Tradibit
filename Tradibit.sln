@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tradibit.Common", "Tradibit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tradibit.Api.Test", "Tradibit.Api.Test\Tradibit.Api.Test.csproj", "{B72E87FA-36F0-4595-B5BC-066CC70B4C73}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tradibit.DataAccess", "Tradibit.DataAccess\Tradibit.DataAccess.csproj", "{5F146A3E-57AC-4CD6-B832-548A1F436447}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{B72E87FA-36F0-4595-B5BC-066CC70B4C73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B72E87FA-36F0-4595-B5BC-066CC70B4C73}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B72E87FA-36F0-4595-B5BC-066CC70B4C73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F146A3E-57AC-4CD6-B832-548A1F436447}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F146A3E-57AC-4CD6-B832-548A1F436447}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F146A3E-57AC-4CD6-B832-548A1F436447}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F146A3E-57AC-4CD6-B832-548A1F436447}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

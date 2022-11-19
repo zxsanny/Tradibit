@@ -1,6 +1,6 @@
 using MediatR;
 
-namespace Tradibit.Common.Events;
+namespace Tradibit.Common.DTO.Events;
 
 public class UserLoginEvent : INotification
 {

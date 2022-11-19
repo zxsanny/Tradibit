@@ -1,28 +1,41 @@
-﻿using Binance.Net.Enums;
+﻿using Binance.Net.Clients;
 using Binance.Net.Interfaces;
 using CryptoExchange.Net.Sockets;
+using MediatR;
 using Skender.Stock.Indicators;
-using Tradibit.Api.Services.Binance;
+using Tradibit.Api.Scenarios;
 using Tradibit.Common;
 using Tradibit.Common.DTO;
+using Tradibit.Common.DTO.Events;
 using Tradibit.Common.Extensions;
 using Tradibit.Common.Interfaces;
 
-namespace Tradibit.Api.Services.Candles;
+namespace Tradibit.Api.Services.CandlesServices;
 
-public class RealtimeCandlesService : BaseBinanceStreamService, ICandlesService
+public class RealtimeCandlesService :
+    INotificationHandler<UserLoginEvent>,
+    INotificationHandler<UserLogoutEvent>
 {
-    private readonly ICoinsService _coinsService;
-        
+    private BinanceClient _client;
+    private BinanceSocketClient _socketClient;
+    private int? _subscription;
     private readonly Dictionary<PairIntervalKey, List<Quote>> _quotes = new();
     private readonly Dictionary<PairIntervalKey, Dictionary<IndicatorEnum, List<decimal?>>> _indicators = new();
     
-    private Func<Pair, Quote, Dictionary<IndicatorEnum, decimal?>, Task> _handler;
-    
-    public RealtimeCandlesService(ILogger<RealtimeCandlesService> logger, ICurrentUserProvider currentUserProvider, ICoinsService coinsService)
-        :base(logger, currentUserProvider)
+    private readonly ILogger<RealtimeCandlesService> _logger;
+    private readonly ICurrentUserProvider _currentUserProvider;
+    private readonly ICoinsService _coinsService;
+    private readonly IMediator _mediator;
+
+    public RealtimeCandlesService(ILogger<RealtimeCandlesService> logger, 
+        ICurrentUserProvider currentUserProvider, 
+        ICoinsService coinsService,
+        IMediator mediator)
     {
+        _logger = logger;
+        _currentUserProvider = currentUserProvider;
         _coinsService = coinsService;
+        _mediator = mediator;
     }
     
     private void OnMessage(DataEvent<IBinanceStreamKlineData> msg)
@@ -40,32 +53,40 @@ public class RealtimeCandlesService : BaseBinanceStreamService, ICandlesService
 
         var indicators = _indicators[candlesKey].ToDictionary(x => x.Key, x => x.Value.LastOrDefault());
 
-        _handler?.Invoke(pair, quotes[^1], indicators);
-    }
-    
-    public async Task SubscribeKlineHandler(Func<Pair, Quote, Dictionary<IndicatorEnum, decimal?>, Task> handler)
-    {
-        _handler = handler;
+        _mediator.Send(new KlineUpdateEvent(pair, quote, indicators));
     }
 
-    protected override async Task<List<int>> LoginHandle(CancellationToken cancellationToken = default)
+    
+    public async Task Handle(UserLoginEvent notification, CancellationToken cancellationToken)
     {
+        _client ??= _currentUserProvider.GetClient();
+        _socketClient ??= _currentUserProvider.GetSocketClient();
+        if (_quotes.Any())
+            return;
+        
         var pairs = await _coinsService.GetMostCapitalisedPairs(cancellationToken);
         foreach (var pair in pairs)
         {
             foreach (var interval in Constants.DefaultIntervals)
             {
                 var candlesKey = new PairIntervalKey(pair, interval);
-                _quotes[candlesKey] = (await Client.SpotApi.ExchangeData.GetKlinesAsync(pair.ToString(), interval, ct: cancellationToken))
+                _quotes[candlesKey] = (await _client.SpotApi.ExchangeData.GetKlinesAsync(pair.ToString(), interval, ct: cancellationToken))
                     .Data.Select(x => x.ToQuote()).ToList();
                 SetIndicators(candlesKey);
             }
         }
-
-        var res = await SocketClient.SpotStreams.SubscribeToKlineUpdatesAsync(pairs.Select(x => x.ToString()), Constants.DefaultIntervals, OnMessage, cancellationToken);
-        return new List<int> { res.Data.Id };
+        
+        var res = await _socketClient.SpotStreams.SubscribeToKlineUpdatesAsync(pairs.Select(x => x.ToString()), Constants.DefaultIntervals, OnMessage,
+            cancellationToken);
+        _subscription = res.Data.Id;
     }
-    
+
+    public async Task Handle(UserLogoutEvent notification, CancellationToken cancellationToken)
+    {
+        if (_subscription.HasValue) 
+            await _socketClient.UnsubscribeAsync(_subscription.Value);
+    }
+
     private void SetIndicators(PairIntervalKey pairIntervalKey)
     {
         var quotes = _quotes[pairIntervalKey];

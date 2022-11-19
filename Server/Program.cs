@@ -1,10 +1,15 @@
+using System.Reflection;
+using MediatR;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Tradibit.Api.Auth;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Tradibit.Api.Services;
-using Tradibit.Api.Services.Candles;
-using Tradibit.Common.DTO;
+using Tradibit.Api.Services.CandlesServices;
 using Tradibit.Common.Extensions;
 using Tradibit.Common.Interfaces;
+using Tradibit.Common.SettingsDTO;
+using Tradibit.DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,28 +20,46 @@ builder.Services.AddRazorPages();
 
 builder.Services
     .ConfigSection<MainTradingSettings>(builder.Configuration)
+    .ConfigSection<AuthConfig>(builder.Configuration)
+    
+    .AddHttpContextAccessor()
+    .AddMediatR(AssemblyExt.GetAllOwnReferencedAssemblies())
+    
     .AddSingleton<RealtimeCandlesService>()
     .AddSingleton<HistoryCandlesService>()
-    .AddScoped<CandlesProviderResolver>(sp => resolverEnum => resolverEnum switch
+    .AddSingleton<IUserBrokerService, UserBrokerService>()
+    .AddSingleton<ICoinsService, CoinsService>()
+    .AddSingleton<ICurrentUserProvider, CurrentUserProvider>()
+    
+    .AddDbContext<TradibitDb>((serviceProvider, optionsBuilder) =>
     {
-        CandlesResolverEnum.Realtime => sp.GetService<RealtimeCandlesService>(),
-        CandlesResolverEnum.History => sp.GetService<HistoryCandlesService>(),
-        _ => throw new ArgumentOutOfRangeException(nameof(resolverEnum), resolverEnum, null)
-    })
-    .AddScoped<IUserBrokerService, UserBrokerService>()
-    .AddScoped<ICoinsService, CoinsService>()
-    .AddSingleton<ICurrentUserProvider, CurrentUserProvider>();;
+        var dbOptions = serviceProvider.GetService<IOptions<DatabaseOptions>>()?.Value;
+        if (dbOptions?.TimeoutSeconds is null || dbOptions.ConnectionString is null)
+            throw new Exception("Please configure sections TimeoutSeconds and ConnectionStrings in DatabaseOptions in config");
+
+        optionsBuilder.UseNpgsql(dbOptions.ConnectionString,
+            sqlOptions => sqlOptions.CommandTimeout(dbOptions.TimeoutSeconds));
+    });
+
+var authConfig = builder.Configuration.GetSection<AuthConfig>();
 
 builder.Services.AddAuthentication(o =>
-{
-    o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(o =>
-{
-    o.SecurityTokenValidators.Clear();
-    o.SecurityTokenValidators.Add(new GoogleTokenValidator());
-});
+    {
+        o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddIdentityServerJwt()
+    .AddGoogle(o =>
+    {
+        o.ClientId = authConfig.GoogleAuth.ClientId;
+        o.ClientSecret = authConfig.GoogleAuth.ClientSecret;
+    });
+//     .AddJwtBearer(o =>
+// {
+//     o.SecurityTokenValidators.Clear();
+//     o.SecurityTokenValidators.Add(new GoogleTokenValidator());
+// });
     
 builder.Services.AddAuthorization();
 

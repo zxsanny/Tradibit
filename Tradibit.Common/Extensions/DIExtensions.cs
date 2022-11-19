@@ -7,4 +7,8 @@ public static class DIExtensions
 {
     public static IServiceCollection ConfigSection<T>(this IServiceCollection services, IConfiguration config) where T : class =>
         services.Configure<T>(config.GetSection(typeof(T).Name));
+    
+    public static T GetSection<T>(this ConfigurationManager config) =>
+        config.GetSection(typeof(T).Name).Get<T>();
+    
 }

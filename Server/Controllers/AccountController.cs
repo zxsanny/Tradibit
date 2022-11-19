@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Tradibit.Common.Entities;
-using Tradibit.Common.Events;
+using Tradibit.Common.DTO.Events;
+using Tradibit.Common.DTO.Queries;
+using Tradibit.Common.Interfaces.API;
+using Tradibit.Common.SettingsDTO;
 
 namespace Tradibit.Api.Controllers;
 
@@ -15,12 +17,10 @@ namespace Tradibit.Api.Controllers;
 public class AccountController : Controller, IAccountApi
 {
     private readonly IMediator _mediator;
-    private readonly AuthConfig _authConfig;
-
-    public AccountController(IMediator mediator, IOptions<AuthConfig> authConfig)
+    
+    public AccountController(IMediator mediator)
     {
         _mediator = mediator;
-        _authConfig = authConfig.Value;
     }
 
     [HttpGet("login")]
@@ -53,31 +53,4 @@ public class AccountController : Controller, IAccountApi
         await HttpContext.SignInAsync(GoogleDefaults.AuthenticationScheme, authRes.Principal);
         return Redirect(returnUrl ?? "/");
     }
-}
-
-public class GetUserQuery : IRequest<User>
-{
-    public string Email { get; set; }
-
-    public GetUserQuery(string email)
-    {
-        Email = email;
-    }
-}
-
-public interface IAccountApi
-{
-}
-
-public class AuthConfig
-{
-    public GoogleAuth GoogleAuth { get; set; }
-    public string Secret { get; set; }
-    public int TokenExpInSeconds { get; set; }
-}
-    
-public class GoogleAuth
-{
-    public string ClientId { get; set; }
-    public string ClientSecret { get; set; }
 }

@@ -1,20 +1,66 @@
 ﻿using System.Collections.Concurrent;
+using Binance.Net.Clients;
 using Binance.Net.Enums;
 using Binance.Net.Objects.Models.Spot.Socket;
 using CryptoExchange.Net.Sockets;
-using Tradibit.Api.Services.Binance;
+using MediatR;
 using Tradibit.Common.DTO;
+using Tradibit.Common.DTO.Events;
 using Tradibit.Common.Interfaces;
 
 namespace Tradibit.Api.Services;
 
-public class UserBrokerService : BaseBinanceStreamService, IUserBrokerService
+public class UserBrokerService : IUserBrokerService,
+    INotificationHandler<UserLoginEvent>,
+    INotificationHandler<UserLogoutEvent>
 {
+    private readonly ILogger<UserBrokerService> _logger;
+    private readonly ICurrentUserProvider _currentUserProvider;
     private readonly ICoinsService _coinsService;
     
-    public UserBrokerService(ILogger<UserBrokerService> logger, ICurrentUserProvider currentUserProvider, ICoinsService coinsService)
-        : base(logger, currentUserProvider)
+    private readonly ConcurrentDictionary<Guid, BinanceClient> _clients = new();
+    private readonly ConcurrentDictionary<Guid, BinanceSocketClient> _socketClients = new();
+    private readonly ConcurrentDictionary<Guid, int> _subscriptions = new();
+
+    private BinanceClient Client => _clients.GetOrAdd(_currentUserProvider.CurrentUser.Id, _ => _currentUserProvider.GetClient());
+
+    private async Task SubscribeSocketClient(CancellationToken cancellationToken)
     {
+        var userId = _currentUserProvider.CurrentUser.Id;
+        if (_socketClients.ContainsKey(userId))
+            return;
+        
+        var socketClient = _currentUserProvider.GetSocketClient();
+        _socketClients.TryAdd(userId, socketClient);
+        
+        var pairs = (await _coinsService.GetMostCapitalisedPairs(cancellationToken))
+            .Select(x => x.ToString());
+        var res = await socketClient.SpotStreams.SubscribeToTradeUpdatesAsync(pairs, OnTradeUpdate, cancellationToken);
+        _subscriptions.TryAdd(userId, res.Data.Id);
+    }
+
+    private async Task UnsubscribeSocketClient(CancellationToken cancellationToken)
+    {
+        var userId = _currentUserProvider.CurrentUser.Id;
+        if (!_socketClients.TryGetValue(userId, out var socketClient))
+            return;
+        
+        if (!_subscriptions.TryGetValue(userId, out var subId))
+            return;
+
+        await socketClient.UnsubscribeAsync(subId);
+    }
+    
+    private void OnTradeUpdate(DataEvent<BinanceStreamTrade> obj)
+    {
+        _binanceTrades.TryAdd(obj);
+    }
+    
+
+    public UserBrokerService(ILogger<UserBrokerService> logger, ICurrentUserProvider currentUserProvider, ICoinsService coinsService)
+    {
+        _logger = logger;
+        _currentUserProvider = currentUserProvider;
         _coinsService = coinsService;
     }
     
@@ -57,20 +103,13 @@ public class UserBrokerService : BaseBinanceStreamService, IUserBrokerService
 
     #endregion
 
-    #region Trade stream Subscriptions
-    
-    protected override async Task<List<int>> LoginHandle(CancellationToken cancellationToken = default)
+    public async Task Handle(UserLoginEvent notification, CancellationToken cancellationToken)
     {
-        var pairs = (await _coinsService.GetMostCapitalisedPairs(cancellationToken))
-            .Select(x => x.ToString());
-        var res = await SocketClient.SpotStreams.SubscribeToTradeUpdatesAsync(pairs, OnTradeUpdate, cancellationToken);
-        return new List<int> { res.Data.Id };
+        await SubscribeSocketClient(cancellationToken);
     }
 
-    private void OnTradeUpdate(DataEvent<BinanceStreamTrade> obj)
+    public Task Handle(UserLogoutEvent notification, CancellationToken cancellationToken)
     {
-        _binanceTrades.TryAdd(obj);
+        throw new NotImplementedException();
     }
-    
-    #endregion
 }
