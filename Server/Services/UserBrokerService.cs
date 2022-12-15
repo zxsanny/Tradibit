@@ -5,63 +5,55 @@ using CryptoExchange.Net.Sockets;
 using MediatR;
 using Tradibit.Common.DTO;
 using Tradibit.Common.DTO.Events;
+using Tradibit.Common.DTO.Events.Coins;
+using Tradibit.Common.DTO.Events.UserBroker;
 using Tradibit.Common.Interfaces;
 using Tradibit.DataAccess;
 
 namespace Tradibit.Api.Services;
 
-public class UserBrokerService : IUserBrokerService,
+public class UserBrokerService : 
     INotificationHandler<UserLoginEvent>,
-    INotificationHandler<UserLogoutEvent>
+    INotificationHandler<UserLogoutEvent>,
+    IRequestHandler<GetBalancesEvent, Dictionary<Currency, decimal>>,
+    IRequestHandler<BuyEvent, decimal>,
+    IRequestHandler<SellEvent, decimal>
 {
     private readonly ILogger<UserBrokerService> _logger;
-    private readonly ICoinsService _coinsService;
     private readonly TradibitDb _db;
     private readonly IClientHolder _clientHolder;
+    private readonly IMediator _mediator;
 
-    public UserBrokerService(ILogger<UserBrokerService> logger, ICoinsService coinsService, TradibitDb db, IClientHolder clientHolder)
+    public UserBrokerService(ILogger<UserBrokerService> logger, TradibitDb db, IClientHolder clientHolder, IMediator mediator)
     {
         _logger = logger;
-        _coinsService = coinsService;
         _db = db;
         _clientHolder = clientHolder;
+        _mediator = mediator;
     }
     
-    #region Balances
-
-    public async Task<decimal> GetUsdtBalance(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<Dictionary<Currency, decimal>> Handle(GetBalancesEvent request, CancellationToken cancellationToken)
     {
-        var client = await _clientHolder.GetClient(userId, cancellationToken);
-        var res = await client.SpotApi.Account.GetAccountInfoAsync(ct: cancellationToken);
-        
-        var result = await client.SpotApi.Account.GetBalancesAsync(asset: Currency.USDT, ct: cancellationToken);
-        return result.Data.FirstOrDefault()!.Total;
-    }
-    
-    public async Task<Dictionary<Currency, decimal>> GetBalances(Guid userId, CancellationToken cancellationToken = default)
-    {
-        var client = await _clientHolder.GetClient(userId, cancellationToken);
-        var result = await client.SpotApi.Account.GetBalancesAsync( ct: cancellationToken);
+        var client = await _clientHolder.GetClient(request.UserId, cancellationToken);
+        var result = await client.SpotApi.Account.GetBalancesAsync(asset: request.Asset, ct: cancellationToken);
         return result.Data.ToDictionary(x => new Currency(x.Asset), x => x.BtcValuation);
     }
-
-    #endregion
     
     #region Simple BUY SELL operations
     
-    public async Task<decimal> Buy(Guid userId, Pair pair, decimal amount, CancellationToken cancellationToken = default) => 
-        await ExecuteOrder(userId, pair, amount, OrderSide.Buy, cancellationToken);
+    public async Task<decimal> Handle(BuyEvent request, CancellationToken cancellationToken) => 
+        await ExecuteOrder(request, OrderSide.Buy, cancellationToken);
 
-    public async Task<decimal> Sell(Guid userId, Pair pair, decimal amount, CancellationToken cancellationToken = default) =>
-        await ExecuteOrder(userId, pair, amount, OrderSide.Sell, cancellationToken);
+    public async Task<decimal> Handle(SellEvent request, CancellationToken cancellationToken) =>
+        await ExecuteOrder(request, OrderSide.Sell, cancellationToken);
     
-    private async Task<decimal> ExecuteOrder(Guid userId, Pair pair, decimal amount, OrderSide orderSide, CancellationToken cancellationToken = default)
+    private async Task<decimal> ExecuteOrder(BaseOrderEvent e, OrderSide orderSide, CancellationToken cancellationToken = default)
     {
-        var client = await _clientHolder.GetClient(userId, cancellationToken);
-        await client.SpotApi.Trading.PlaceOrderAsync(pair.ToString(), orderSide, SpotOrderType.Market, amount, ct: cancellationToken);
+        var client = await _clientHolder.GetClient(e.UserId, cancellationToken);
+        await client.SpotApi.Trading.PlaceOrderAsync(e.Pair.ToString(), orderSide, SpotOrderType.Market, e.Amount, ct: cancellationToken);
         
         foreach (var trade in _clientHolder.BinanceTrades.GetConsumingEnumerable())
-            if (trade.UserId == userId && trade.Event.Data.Symbol == pair.ToString())
+            if (trade.UserId == e.UserId && trade.Event.Data.Symbol == e.Pair.ToString())
                 return trade.Event.Data.Quantity;
         
         throw new Exception("No event occured");
@@ -73,7 +65,7 @@ public class UserBrokerService : IUserBrokerService,
     public async Task Handle(UserLoginEvent loginEvent, CancellationToken cancellationToken)
     {
         var socketClient = await _clientHolder.GetSocketClient(loginEvent.UserId, cancellationToken);
-        var pairs = (await _coinsService.GetMostCapitalisedPairs(cancellationToken))
+        var pairs = (await _mediator.Send(new GetMostCapCoinsEvent(loginEvent.UserId), cancellationToken))
             .Select(x => x.ToString());
         var res = await socketClient.SpotStreams.SubscribeToTradeUpdatesAsync(pairs,
             tradeEvent => OnTradeUpdate(loginEvent.UserId, tradeEvent), cancellationToken);

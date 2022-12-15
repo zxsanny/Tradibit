@@ -1,4 +1,5 @@
 ﻿using Binance.Net.Clients;
+using Binance.Net.Enums;
 using Binance.Net.Interfaces;
 using CryptoExchange.Net.Sockets;
 using MediatR;
@@ -6,29 +7,36 @@ using Skender.Stock.Indicators;
 using Tradibit.Common;
 using Tradibit.Common.DTO;
 using Tradibit.Common.DTO.Events;
+using Tradibit.Common.DTO.Events.Coins;
+using Tradibit.Common.DTO.Events.Scenarios;
 using Tradibit.Common.Extensions;
 using Tradibit.Common.Interfaces;
 
-namespace Tradibit.Api.Services.CandlesServices;
+namespace Tradibit.Api.Services;
 
-public class RealtimeCandlesProvider : INotificationHandler<UserLoginEvent>
+public class CandlesProvider : 
+    ICandlesProvider,
+    INotificationHandler<UserLoginEvent>,
+    IRequestHandler<ReplyHistoryEvent>
 {
     private BinanceClient _client;
     private BinanceSocketClient _socketClient;
-    private int? _subscription;
+    
     private static readonly Dictionary<PairIntervalKey, List<Quote>> Quotes = new();
     private static readonly Dictionary<PairIntervalKey, Dictionary<IndicatorEnum, List<decimal?>>> Indicators = new();
     
-    private readonly ILogger<RealtimeCandlesProvider> _logger;
-    private readonly ClientHolder _clientHolder;
-    private readonly ICoinsService _coinsService;
-    private readonly IMediator _mediator;
+    private readonly Dictionary<PairIntervalKey, List<Quote>> _historyQuotes = new();
+    private readonly Dictionary<PairIntervalKey, Dictionary<IndicatorEnum, List<decimal?>>> _historyIndicators = new();
 
-    public RealtimeCandlesProvider(ILogger<RealtimeCandlesProvider> logger, ClientHolder clientHolder, ICoinsService coinsService, IMediator mediator)
+    private readonly ILogger<CandlesProvider> _logger;
+    private readonly ClientHolder _clientHolder;
+    private readonly IMediator _mediator;
+    private int _subscription;
+
+    public CandlesProvider(ILogger<CandlesProvider> logger, ClientHolder clientHolder, IMediator mediator)
     {
         _logger = logger;
         _clientHolder = clientHolder;
-        _coinsService = coinsService;
         _mediator = mediator;
     }
     
@@ -41,8 +49,8 @@ public class RealtimeCandlesProvider : INotificationHandler<UserLoginEvent>
         _socketClient ??= await _clientHolder.GetSocketClient(userLoginEvent.UserId, cancellationToken);
         if (Quotes.Any())
             return;
-        
-        var pairs = await _coinsService.GetMostCapitalisedPairs(cancellationToken);
+
+        var pairs = await _mediator.Send(new GetMostCapCoinsEvent(userLoginEvent.UserId), cancellationToken);
         foreach (var pair in pairs)
         {
             foreach (var interval in Constants.DefaultIntervals)
@@ -73,10 +81,45 @@ public class RealtimeCandlesProvider : INotificationHandler<UserLoginEvent>
         SetIndicators(candlesKey);
 
         var indicators = Indicators[candlesKey].ToDictionary(x => x.Key, x => x.Value.LastOrDefault());
-
-        _mediator.Send(new KlineUpdateEvent(pair, quote, indicators));
+        
+        _mediator.Send(new KlineUpdateEvent(pair, new QuoteIndicator(quote, indicators)));
     }
 
+    
+    public async Task<Unit> Handle(ReplyHistoryEvent e, CancellationToken cancellationToken)
+    {
+        var pairs = e.Pairs ?? await _mediator.Send(new GetMostCapCoinsEvent(e.UserId), cancellationToken);
+        var intervals = e.Intervals ?? Constants.DefaultIntervals;
+
+        foreach (var pair in pairs)
+        {
+            foreach (var interval in intervals)
+            {
+                var candlesKey = new PairIntervalKey(pair, interval);
+                _historyQuotes[candlesKey] = (await _client.SpotApi.ExchangeData.GetKlinesAsync(pair.ToString(), interval, 
+                        startTime: DateTime.UtcNow.Subtract(e.HistorySpan), ct: cancellationToken))
+                    .Data.Select(x => x.ToQuote()).ToList();
+                SetIndicators(candlesKey);
+            }
+        }
+
+        var totalCount = _historyQuotes[new PairIntervalKey(pairs.First(), Constants.DefaultIntervals.First())].Count;
+
+        for (int c = 0; c < totalCount; c++)
+            foreach (var pair in pairs)
+            {
+                foreach (var interval in Constants.DefaultIntervals)
+                {
+                    var candlesKey = new PairIntervalKey(pair, interval);
+                    var indicators = _historyIndicators[candlesKey].ToDictionary(x => x.Key, x => x.Value[c]);
+
+                    var quote = _historyQuotes[candlesKey][c];
+                    await _mediator.Send(new KlineHistoryUpdateEvent(e.ScenarioId, new KlineUpdateEvent(pair, new QuoteIndicator(quote, indicators))), cancellationToken);
+                }   
+            }
+        return Unit.Value;
+    }
+    
     private void SetIndicators(PairIntervalKey pairIntervalKey)
     {
         var quotes = Quotes[pairIntervalKey];
@@ -95,4 +138,7 @@ public class RealtimeCandlesProvider : INotificationHandler<UserLoginEvent>
         ind[IndicatorEnum.BOLLINGER_UPPER] = quotes.GetBollingerBands().Select(x => (decimal?)x.UpperBand).ToList();
         ind[IndicatorEnum.BOLLINGER_LOWER] = quotes.GetBollingerBands().Select(x => (decimal?)x.LowerBand).ToList();        
     }
+
+    public decimal BtcValue => 
+        Quotes[new PairIntervalKey(new Pair(Currency.BTC, Currency.USDT), KlineInterval.FifteenMinutes)].LastOrDefault()?.Close ?? 0;
 }

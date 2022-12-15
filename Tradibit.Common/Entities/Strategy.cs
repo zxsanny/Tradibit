@@ -30,9 +30,9 @@ public class Transition
     public List<IOperation> SuccessOperations { get; set; }
     public Guid DestinationStepId { get; set; }
 
-    public async Task<bool> TryTransit(Scenario scenario)
+    public async Task<bool> TryTransit(Scenario scenario, QuoteIndicator quoteIndicator)
     {
-        if (!Conditions.All(c => c.Meet(scenario.State)))
+        if (!Conditions.All(c => c.Meet(scenario.State, quoteIndicator)))
             return false;
         
         await Task.WhenAll(SuccessOperations.Select(x => x.Start(scenario)).ToArray());
@@ -64,10 +64,10 @@ public class Condition
     public Operand Operand2 { get; set; }
     public OperationEnum Operation { get; set; }
 
-    public bool Meet(ScenarioState state)
+    public bool Meet(ScenarioState state, QuoteIndicator quoteIndicator)
     {
-        var op1 = Operand1.GetValue(state);
-        var op2 = Operand2.GetValue(state);
+        var op1 = Operand1.GetValue(state, quoteIndicator);
+        var op2 = Operand2.GetValue(state, quoteIndicator);
         if (!op1.HasValue || !op2.HasValue)
             return false;
         
@@ -97,7 +97,7 @@ public class Operand
     public Operand(IndicatorEnum? indicator) => Indicator = indicator;
     public Operand(string userVarName) => UserVarName = userVarName;
 
-    public decimal? GetValue(ScenarioState state)
+    public decimal? GetValue(ScenarioState state, QuoteIndicator quoteIndicator)
     {
         if (NumValue.HasValue)
             return NumValue.Value;
@@ -106,17 +106,17 @@ public class Operand
         {
             return Quote switch
             {
-                QuoteEnum.Open => state.LastQuote.Open,
-                QuoteEnum.High => state.LastQuote.High,
-                QuoteEnum.Low => state.LastQuote.Low,
-                QuoteEnum.Close => state.LastQuote.Close,
-                QuoteEnum.Volume => state.LastQuote.Volume,
+                QuoteEnum.Open => quoteIndicator.Quote.Open,
+                QuoteEnum.High => quoteIndicator.Quote.High,
+                QuoteEnum.Low => quoteIndicator.Quote.Low,
+                QuoteEnum.Close => quoteIndicator.Quote.Close,
+                QuoteEnum.Volume => quoteIndicator.Quote.Volume,
                 _ => throw new ArgumentException("invalid Quote value")
             };
         }
         
         if (Indicator.HasValue)
-            return state.LastIndicators[Indicator.Value];
+            return quoteIndicator.Indicators[Indicator.Value];
     
         if (!string.IsNullOrWhiteSpace(UserVarName))
             return state.UserVars[UserVarName];

@@ -34,7 +34,4 @@ public class ScenarioState
     public Guid CurrentStepId { get; set; }
         
     public Pair ActivePair { get; set; }
-    
-    public Quote LastQuote { get; set; }
-    public Dictionary<IndicatorEnum, decimal?> LastIndicators { get; set; }
 }

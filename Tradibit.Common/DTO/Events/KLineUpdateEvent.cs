@@ -1,34 +1,25 @@
-﻿using System.Runtime;
-using MediatR;
-using Skender.Stock.Indicators;
+﻿using MediatR;
 
 namespace Tradibit.Common.DTO.Events;
 
 public class KlineUpdateEvent : IRequest<Unit>
 {
     public Pair Pair { get; set; }
-    public Quote Quote { get; set; } 
-    public Dictionary<IndicatorEnum, decimal?> Indicators { get; set; }
-    public bool IsHistory { get; set; }
+    public QuoteIndicator QuoteIndicator { get; set; }
     
-    public KlineUpdateEvent(Pair pair, Quote quote, Dictionary<IndicatorEnum, decimal?> indicators, bool isHistory = false)
+    public KlineUpdateEvent(Pair pair, QuoteIndicator quoteIndicator)
     {
         Pair = pair;
-        Quote = quote;
-        Indicators = indicators;
-        IsHistory = isHistory;
+        QuoteIndicator = quoteIndicator;
     }
 }
 
-public class HistoryKlineUpdateEvent : KlineUpdateEvent
+public class KlineHistoryUpdateEvent : KlineUpdateEvent
 {
     public Guid ScenarioId { get; set; }
-    public Guid UserId { get; set; }
-    
-    public HistoryKlineUpdateEvent(Guid scenarioId, Guid userId, Pair pair, Quote quote, Dictionary<IndicatorEnum, decimal?> indicators, bool isHistory = false)
-        : base(pair, quote, indicators, isHistory)
+
+    public KlineHistoryUpdateEvent(Guid scenarioId, KlineUpdateEvent klineUpdateEvent) : base(klineUpdateEvent.Pair, klineUpdateEvent.QuoteIndicator)
     {
         ScenarioId = scenarioId;
-        UserId = userId;
     }
 }

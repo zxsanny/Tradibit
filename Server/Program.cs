@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Tradibit.Api.Services;
-using Tradibit.Api.Services.CandlesServices;
 using Tradibit.Common.Extensions;
 using Tradibit.Common.Interfaces;
 using Tradibit.Common.SettingsDTO;
@@ -26,9 +25,7 @@ builder.Services
     .AddMediatR(AssemblyExt.GetAllOwnReferencedAssemblies())
     
     .AddSingleton<IClientHolder, ClientHolder>()
-    .AddSingleton<RealtimeCandlesProvider>()
-    .AddSingleton<HistoryCandlesService>()
-    .AddSingleton<ICoinsService, CoinsService>()
+    .AddSingleton<CandlesProvider>()
     .AddSingleton<ICurrentUserProvider, CurrentUserProvider>()
     
     .AddDbContext<TradibitDb>((serviceProvider, optionsBuilder) =>

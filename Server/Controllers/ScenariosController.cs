@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Tradibit.Common.DTO;
 using Tradibit.Common.DTO.Events;
+using Tradibit.Common.DTO.Events.Scenarios;
 using Tradibit.Common.DTO.Queries;
 using Tradibit.Common.Entities;
 using Tradibit.Common.Interfaces.API;
