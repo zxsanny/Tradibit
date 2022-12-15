@@ -8,10 +8,7 @@ public class Scenario : BaseTrackableId
     public Guid UserId { get; set; }
     public Guid StrategyId { get; set; }
     
-    public string Name { get; set; }
-    
-    private readonly User _user;
-    
+    public User User { get; set; }
     public Strategy Strategy { get; set; }
     public ScenarioState State { get; set; }
     

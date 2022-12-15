@@ -9,6 +9,8 @@ public class User : BaseTrackableId
 {
     public string Name { get; set; }
     public string Email { get; set; }
+    public string ImageUrl { get; set; }
+    
     public string BinanceKeyHash { get; set; }
     public string BinanceSecretHash { get; set; }
 

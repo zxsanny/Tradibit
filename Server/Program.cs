@@ -25,9 +25,9 @@ builder.Services
     .AddHttpContextAccessor()
     .AddMediatR(AssemblyExt.GetAllOwnReferencedAssemblies())
     
-    .AddSingleton<RealtimeCandlesService>()
+    .AddSingleton<IClientHolder, ClientHolder>()
+    .AddSingleton<RealtimeCandlesProvider>()
     .AddSingleton<HistoryCandlesService>()
-    .AddSingleton<IUserBrokerService, UserBrokerService>()
     .AddSingleton<ICoinsService, CoinsService>()
     .AddSingleton<ICurrentUserProvider, CurrentUserProvider>()
     

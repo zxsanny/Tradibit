@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System.Runtime;
+using MediatR;
 using Skender.Stock.Indicators;
 
 namespace Tradibit.Common.DTO.Events;
@@ -16,5 +17,18 @@ public class KlineUpdateEvent : IRequest<Unit>
         Quote = quote;
         Indicators = indicators;
         IsHistory = isHistory;
+    }
+}
+
+public class HistoryKlineUpdateEvent : KlineUpdateEvent
+{
+    public Guid ScenarioId { get; set; }
+    public Guid UserId { get; set; }
+    
+    public HistoryKlineUpdateEvent(Guid scenarioId, Guid userId, Pair pair, Quote quote, Dictionary<IndicatorEnum, decimal?> indicators, bool isHistory = false)
+        : base(pair, quote, indicators, isHistory)
+    {
+        ScenarioId = scenarioId;
+        UserId = userId;
     }
 }

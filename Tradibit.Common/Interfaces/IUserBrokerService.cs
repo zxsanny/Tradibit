@@ -10,3 +10,4 @@ public interface IUserBrokerService
     Task<decimal> Buy(Pair pair, decimal amount, CancellationToken cancellationToken = default);
     Task<decimal> Sell(Pair pair, decimal amount, CancellationToken cancellationToken = default);
 }
+

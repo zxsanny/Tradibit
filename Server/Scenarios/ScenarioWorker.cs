@@ -32,56 +32,14 @@ public class ScenarioWorker :
         _mediator = mediator;
         _db = db;
     }
-
-    // private async Task HistoryHandler(Pair pair, Quote quote, Dictionary<IndicatorEnum, decimal?> indicators)
-    // {
-    //     var exchangeFee = 0.001m;
-    //     State.LastQuote = quote;
-    //     State.LastIndicators = indicators;
-    //     
-    //     if (State.ActivePair is null && Strategy.BuyConditions.All(c => c.Meet(State)))
-    //     {
-    //         State.PositionMoney = (1 - exchangeFee) * State.DepositMoney * quote.Close;
-    //         State.DepositMoney = 0;
-    //         State.ActivePair = pair;
-    //     }
-    //
-    //     if (State.ActivePair == pair && Strategy.SellConditions.All(c => c.Meet(State)))
-    //     {
-    //         State.DepositMoney = (1 - exchangeFee) * State.PositionMoney / quote.Close;
-    //         State.PositionMoney = 0;
-    //         State.ActivePair = null;
-    //     }
-    // }
-    //
-    // private async Task Handler(Pair pair, Quote quote, Dictionary<IndicatorEnum, decimal?> indicators)
-    // {
-    //     State.LastQuote = quote;
-    //     State.LastIndicators = indicators;
-    //     
-    //     if (State.ActivePair is null && Strategy.BuyConditions.All(c => c.Meet(State)))
-    //     {
-    //         State.PositionMoney = await _userBrokerService.Buy(pair, State.DepositMoney);
-    //         State.DepositMoney = 0;
-    //         State.ActivePair = pair;
-    //     }
-    //
-    //     if (State.ActivePair == pair && Strategy.SellConditions.All(c => c.Meet(State)))
-    //     {
-    //         State.DepositMoney = await _userBrokerService.Sell(pair, State.PositionMoney);
-    //         State.PositionMoney = 0;
-    //         State.ActivePair = null;
-    //     }
-    // }
-
+    
     public async Task<Unit> Handle(StartScenarioEvent request, CancellationToken cancellationToken)
     {
         var scenario = await _db.Scenarios.FindAsync(request.ScenarioId, cancellationToken);
         var deposit = await _userBrokerService.GetUsdtBalance(cancellationToken) * scenario.DepositPercent;
         StartScenario(false, scenario, deposit, cancellationToken);
         return Unit.Value;
-    } 
-        
+    }
 
     public async Task<Unit> Handle(StartHistoryTestScenarioEvent request, CancellationToken cancellationToken)
     {
@@ -113,35 +71,29 @@ public class ScenarioWorker :
         
         _init = true;
     }
-    
 
-    public async Task<Unit> Handle(KlineUpdateEvent request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(KlineUpdateEvent e, CancellationToken cancellationToken)
     {
-        var scenarios = GetScenarios(request.IsHistory);
+        var scenarios = GetScenarios(e.IsHistory);
         foreach (var scenario in scenarios)
-            await ProcessKlineUpdate(scenario.Value, request);
+        {
+            bool transited;
+            do //could be multiple transition on 1 Kline update
+            {
+                transited = false;
+                foreach (var transition in scenario.Value.CurrentStep.Transitions)
+                {
+                    transited = await transition.TryTransit(scenario.Value);
+                    if (transited)
+                    {
+                        await _db.Save(scenario.Value, cancellationToken);
+                        break;
+                    }
+                }
+            } while (transited);    
+        }
         return Unit.Value;
     }
-
-    private async Task ProcessKlineUpdate(Scenario scenario, KlineUpdateEvent request)
-    {
-        bool transited;
-        //could be multiple transition on 1 Kline update
-        do
-        {
-            transited = false;
-            foreach (var transition in scenario.CurrentStep.Transitions)
-            {
-                transited = await transition.TryTransit(scenario.State);
-                if (transited)
-                {
-                    await _db.Save(scenario);
-                    break;
-                }
-            }
-        } while (transited);
-    }
-
 
     public async Task<Unit> Handle(StopScenarioEvent request, CancellationToken cancellationToken)
     {

@@ -15,7 +15,7 @@ public class StartHistoryTestScenarioEvent : BaseScenarioEvent
     public List<KlineInterval> Intervals { get; set; }
 }
 
-public class ReplyHistoryEvent : IRequest<Unit>
+public class ReplyHistoryEvent : BaseScenarioEvent
 {
     public TimeSpan HistorySpan { get; set; } 
     public List<Pair> Pairs { get; set; }
@@ -38,4 +38,5 @@ public class StopScenarioEvent : BaseScenarioEvent
 public abstract class BaseScenarioEvent : IRequest<Unit>
 {
     public Guid ScenarioId { get; set; }
+    public Guid UserId { get; set; }
 }

@@ -15,7 +15,7 @@ public class HistoryCandlesService :
     IRequestHandler<ReplyHistoryEvent>
 {
     private readonly ILogger<HistoryCandlesService> _logger;
-    private readonly ICurrentUserProvider _currentUserProvider;
+    private readonly IClientHolder _clientHolder;
     private readonly ICoinsService _coinsService;
     private BinanceClient _client;
     
@@ -24,24 +24,21 @@ public class HistoryCandlesService :
     private readonly IMediator _mediator;
 
     public HistoryCandlesService(ILogger<HistoryCandlesService> logger, ICurrentUserProvider currentUserProvider,
-        ICoinsService coinsService, 
-        IMediator mediator)
+        IClientHolder clientHolder, ICoinsService coinsService, IMediator mediator)
     {
         _logger = logger;
-        _currentUserProvider = currentUserProvider;
+        _clientHolder = clientHolder;
         _coinsService = coinsService;
         _mediator = mediator;
     }
     
-    public async Task Handle(UserLoginEvent notification, CancellationToken cancellationToken)
+    public async Task Handle(UserLoginEvent userLoginEvent, CancellationToken cancellationToken) => 
+        _client = await _clientHolder.GetClient(userLoginEvent.UserId, cancellationToken);
+
+    public async Task<Unit> Handle(ReplyHistoryEvent e, CancellationToken cancellationToken)
     {
-        _client ??= _currentUserProvider.GetClient();
-    }
-    
-    public async Task<Unit> Handle(ReplyHistoryEvent request, CancellationToken cancellationToken)
-    {
-        var pairs = request.Pairs ?? await _coinsService.GetMostCapitalisedPairs(cancellationToken);
-        var intervals = request.Intervals ?? Constants.DefaultIntervals;
+        var pairs = e.Pairs ?? await _coinsService.GetMostCapitalisedPairs(cancellationToken);
+        var intervals = e.Intervals ?? Constants.DefaultIntervals;
 
         foreach (var pair in pairs)
         {
@@ -49,7 +46,7 @@ public class HistoryCandlesService :
             {
                 var candlesKey = new PairIntervalKey(pair, interval);
                 _quotes[candlesKey] = (await _client.SpotApi.ExchangeData.GetKlinesAsync(pair.ToString(), interval, 
-                    startTime: DateTime.UtcNow.Subtract(request.HistorySpan), ct: cancellationToken))
+                    startTime: DateTime.UtcNow.Subtract(e.HistorySpan), ct: cancellationToken))
                     .Data.Select(x => x.ToQuote()).ToList();
                 SetIndicators(candlesKey);
             }
@@ -65,7 +62,7 @@ public class HistoryCandlesService :
                     var indicators = _indicators[candlesKey].ToDictionary(x => x.Key, x => x.Value[c]);
 
                     var quote = _quotes[candlesKey][c];
-                    await _mediator.Send(new KlineUpdateEvent(pair, quote, indicators, true), cancellationToken);
+                    await _mediator.Send(new HistoryKlineUpdateEvent(e.ScenarioId, e.UserId, pair, quote, indicators, true), cancellationToken);
                 }
         return Unit.Value;
     }

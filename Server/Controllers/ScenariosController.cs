@@ -19,9 +19,6 @@ public class ScenariosController : TradibitBaseController, IScenariosApi
     public async Task<Response> CreateScenario(ScenarioCreatedEvent command) =>
         await Send(command);
     
-    public async Task<Response> CreateScenario(ScenarioUpdatedEvent command) =>
-        await Send(command);
-
     public async Task<Response> TestScenarioHistory(StartHistoryTestScenarioEvent query) =>
         await Send(query);
 

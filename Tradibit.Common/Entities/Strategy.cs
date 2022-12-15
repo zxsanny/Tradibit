@@ -1,14 +1,17 @@
 using System.ComponentModel.DataAnnotations;
+using System.Security.AccessControl;
 using Binance.Net.Enums;
 using Tradibit.Common.DTO;
+using Tradibit.Common.Interfaces;
 
 namespace Tradibit.Common.Entities;
 
-public class Strategy
+public class Strategy : BaseTrackableId
 {
-    public Guid Id { get; set; }
     public string Name { get; set; }
+    public string ImageUrl { get; set; }
     public List<Step> Steps { get; set; }
+    public bool IsPublic { get; set; }
 }
 
 public class Step
@@ -22,17 +25,18 @@ public class Step
 
 public class Transition
 {
+    public string Name { get; set; }
     public List<Condition> Conditions { get; set; }
     public List<IOperation> SuccessOperations { get; set; }
     public Guid DestinationStepId { get; set; }
 
-    public async Task<bool> TryTransit(ScenarioState state)
+    public async Task<bool> TryTransit(Scenario scenario)
     {
-        if (!Conditions.All(c => c.Meet(state)))
+        if (!Conditions.All(c => c.Meet(scenario.State)))
             return false;
         
-        await Task.WhenAll(SuccessOperations.Select(x => x.Start(state)).ToArray());
-        state.CurrentStepId = DestinationStepId;
+        await Task.WhenAll(SuccessOperations.Select(x => x.Start(scenario)).ToArray());
+        scenario.State.CurrentStepId = DestinationStepId;
         return true;
     }
         
@@ -40,7 +44,7 @@ public class Transition
 
 public interface IOperation
 {
-    public Task Start(ScenarioState state);
+    public Task Start(Scenario state);
 }
 
 public class OrderOperation : IOperation
@@ -48,7 +52,7 @@ public class OrderOperation : IOperation
     public OrderSide OrderSide { get; set; }
     public decimal Percent { get; set; }
     
-    public async Task Start(ScenarioState state)
+    public async Task Start(Scenario scenario)
     {
         
     }
