@@ -3,30 +3,23 @@ using Binance.Net.Clients;
 using Binance.Net.Objects.Models.Spot.Socket;
 using CryptoExchange.Net.Sockets;
 using Tradibit.Common.Entities;
+using Tradibit.Common.Interfaces;
 using Tradibit.DataAccess;
 
 namespace Tradibit.Api.Services;
 
-public interface IClientHolder
-{
-    Task<BinanceClient> GetClient(Guid userId, CancellationToken cancellationToken = default);
-    Task<BinanceSocketClient> GetSocketClient(Guid userId, CancellationToken cancellationToken = default);
-    BlockingCollection<(Guid UserId, DataEvent<BinanceStreamTrade> Event)> BinanceTrades { get; }
-    ConcurrentDictionary<Guid, int> Subscriptions { get; }
-}
-
 public class ClientHolder : IClientHolder
 {
-    private readonly TradibitDb _db;
+    private readonly IServiceScopeFactory _scopeFactory;
     private readonly ConcurrentDictionary<Guid, BinanceClient> _clients = new();
     private readonly ConcurrentDictionary<Guid, BinanceSocketClient> _socketClients = new();
 
     public ConcurrentDictionary<Guid, int> Subscriptions { get; } = new();
     public BlockingCollection<(Guid UserId, DataEvent<BinanceStreamTrade> Event)> BinanceTrades { get; } = new();
 
-    public ClientHolder(TradibitDb db)
+    public ClientHolder(IServiceScopeFactory scopeFactory)
     {
-        _db = db;
+        _scopeFactory = scopeFactory;
     }
     
     private async Task<TClient> GetClientGeneral<TClient>(ConcurrentDictionary<Guid, TClient> clientsStore, Guid userId, 
@@ -34,9 +27,12 @@ public class ClientHolder : IClientHolder
     {
         if (clientsStore.TryGetValue(userId, out var client))
             return client;
-        var user = await _db.Users.FindAsync(userId, cancellationToken); 
-        client = getClientFunc(user);
+
+        using var scope = _scopeFactory.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<TradibitDb>();
+        var user = await db.Users.FindAsync(userId, cancellationToken); 
         
+        client = getClientFunc(user);
         clientsStore.TryAdd(userId, client);
         return client;
     }

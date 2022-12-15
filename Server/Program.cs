@@ -25,7 +25,7 @@ builder.Services
     .AddMediatR(AssemblyExt.GetAllOwnReferencedAssemblies())
     
     .AddSingleton<IClientHolder, ClientHolder>()
-    .AddSingleton<CandlesProvider>()
+    .AddSingleton<ICandlesProvider, CandlesProvider>()
     .AddSingleton<ICurrentUserProvider, CurrentUserProvider>()
     
     .AddDbContext<TradibitDb>((serviceProvider, optionsBuilder) =>

@@ -14,8 +14,7 @@ using Tradibit.Common.Interfaces;
 
 namespace Tradibit.Api.Services;
 
-public class CandlesProvider : 
-    ICandlesProvider,
+public class CandlesProvider : ICandlesProvider,
     INotificationHandler<UserLoginEvent>,
     IRequestHandler<ReplyHistoryEvent>
 {
@@ -29,11 +28,11 @@ public class CandlesProvider :
     private readonly Dictionary<PairIntervalKey, Dictionary<IndicatorEnum, List<decimal?>>> _historyIndicators = new();
 
     private readonly ILogger<CandlesProvider> _logger;
-    private readonly ClientHolder _clientHolder;
+    private readonly IClientHolder _clientHolder;
     private readonly IMediator _mediator;
     private int _subscription;
 
-    public CandlesProvider(ILogger<CandlesProvider> logger, ClientHolder clientHolder, IMediator mediator)
+    public CandlesProvider(ILogger<CandlesProvider> logger, IClientHolder clientHolder, IMediator mediator)
     {
         _logger = logger;
         _clientHolder = clientHolder;

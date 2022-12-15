@@ -13,9 +13,9 @@ namespace Tradibit.Api.Services;
 public class CoinsService : IRequestHandler<GetMostCapCoinsEvent, List<Pair>>
 {
     private readonly MainTradingSettings _mainTradingSettings;
-    private readonly ClientHolder _clientHolder;
+    private readonly IClientHolder _clientHolder;
     
-    public CoinsService(ILogger<CoinsService> logger, IOptions<MainTradingSettings> mainTradingSettings, ClientHolder clientHolder)
+    public CoinsService(ILogger<CoinsService> logger, IOptions<MainTradingSettings> mainTradingSettings, IClientHolder clientHolder)
     {
         _clientHolder = clientHolder;
         _mainTradingSettings = mainTradingSettings.Value;

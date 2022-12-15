@@ -20,14 +20,12 @@ public class UserBrokerService :
     IRequestHandler<SellEvent, decimal>
 {
     private readonly ILogger<UserBrokerService> _logger;
-    private readonly TradibitDb _db;
     private readonly IClientHolder _clientHolder;
     private readonly IMediator _mediator;
 
     public UserBrokerService(ILogger<UserBrokerService> logger, TradibitDb db, IClientHolder clientHolder, IMediator mediator)
     {
         _logger = logger;
-        _db = db;
         _clientHolder = clientHolder;
         _mediator = mediator;
     }
