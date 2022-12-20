@@ -1,9 +1,14 @@
 ﻿@using Tradibit.Common.DTO.Dashboard
+@using Tradibit.Common.DTO
 <h3>User Funds</h3>
 <RadzenChart></RadzenChart>
-<Scorecard Stat="UserDashboard.UserStat"></Scorecard>
+<Scorecard Stat="UserStat"></Scorecard>
 
 @code {
+    
     [Parameter]
-    public UserDashboard UserDashboard { get; set; }
+    public List<TimeValue> UserFunds { get; set; }
+    
+    [Parameter]
+    public ProfitLossStat UserStat { get; set; }
 }

@@ -4,8 +4,8 @@ using Binance.Net.Objects.Models.Spot.Socket;
 using CryptoExchange.Net.Sockets;
 using MediatR;
 using Tradibit.Common.DTO;
+using Tradibit.Common.DTO.Coins;
 using Tradibit.Common.DTO.Events;
-using Tradibit.Common.DTO.Events.Coins;
 using Tradibit.Common.DTO.Events.UserBroker;
 using Tradibit.Common.Interfaces;
 using Tradibit.DataAccess;
@@ -63,7 +63,7 @@ public class UserBrokerService :
     public async Task Handle(UserLoginEvent loginEvent, CancellationToken cancellationToken)
     {
         var socketClient = await _clientHolder.GetSocketClient(loginEvent.UserId, cancellationToken);
-        var pairs = (await _mediator.Send(new GetMostCapCoinsEvent(loginEvent.UserId), cancellationToken))
+        var pairs = (await _mediator.Send(new GetMostCapCoinsRequest(loginEvent.UserId), cancellationToken))
             .Select(x => x.ToString());
         var res = await socketClient.SpotStreams.SubscribeToTradeUpdatesAsync(pairs,
             tradeEvent => OnTradeUpdate(loginEvent.UserId, tradeEvent), cancellationToken);

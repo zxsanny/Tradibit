@@ -6,8 +6,8 @@ using MediatR;
 using Skender.Stock.Indicators;
 using Tradibit.Common;
 using Tradibit.Common.DTO;
+using Tradibit.Common.DTO.Coins;
 using Tradibit.Common.DTO.Events;
-using Tradibit.Common.DTO.Events.Coins;
 using Tradibit.Common.DTO.Events.Scenarios;
 using Tradibit.Common.Extensions;
 using Tradibit.Common.Interfaces;
@@ -49,7 +49,7 @@ public class CandlesProvider : ICandlesProvider,
         if (Quotes.Any())
             return;
 
-        var pairs = await _mediator.Send(new GetMostCapCoinsEvent(userLoginEvent.UserId), cancellationToken);
+        var pairs = await _mediator.Send(new GetMostCapCoinsRequest(userLoginEvent.UserId), cancellationToken);
         foreach (var pair in pairs)
         {
             foreach (var interval in Constants.DefaultIntervals)
@@ -87,7 +87,7 @@ public class CandlesProvider : ICandlesProvider,
     
     public async Task<Unit> Handle(ReplyHistoryEvent e, CancellationToken cancellationToken)
     {
-        var pairs = e.Pairs ?? await _mediator.Send(new GetMostCapCoinsEvent(e.UserId), cancellationToken);
+        var pairs = e.Pairs ?? await _mediator.Send(new GetMostCapCoinsRequest(e.UserId), cancellationToken);
         var intervals = e.Intervals ?? Constants.DefaultIntervals;
 
         foreach (var pair in pairs)

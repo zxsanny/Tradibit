@@ -3,14 +3,14 @@ using MediatR;
 using Microsoft.Extensions.Options;
 using Tradibit.Common;
 using Tradibit.Common.DTO;
+using Tradibit.Common.DTO.Coins;
 using Tradibit.Common.DTO.Events;
-using Tradibit.Common.DTO.Events.Coins;
 using Tradibit.Common.Interfaces;
 using Tradibit.Common.SettingsDTO;
 
 namespace Tradibit.Api.Services;
 
-public class CoinsService : IRequestHandler<GetMostCapCoinsEvent, List<Pair>>
+public class CoinsService : IRequestHandler<GetMostCapCoinsRequest, List<Pair>>
 {
     private readonly MainTradingSettings _mainTradingSettings;
     private readonly IClientHolder _clientHolder;
@@ -22,7 +22,7 @@ public class CoinsService : IRequestHandler<GetMostCapCoinsEvent, List<Pair>>
     }
     
     //TODO: Take coin's volatility into an account
-    public async Task<List<Pair>> Handle(GetMostCapCoinsEvent request, CancellationToken cancellationToken)
+    public async Task<List<Pair>> Handle(GetMostCapCoinsRequest request, CancellationToken cancellationToken)
     {
         var client = await _clientHolder.GetClient(request.UserId, cancellationToken);  
         

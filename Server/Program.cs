@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Tradibit.Api.Services;
+using Tradibit.Client.Shared;
 using Tradibit.Common.Extensions;
 using Tradibit.Common.Interfaces;
 using Tradibit.Common.SettingsDTO;
@@ -36,7 +37,8 @@ builder.Services
 
         optionsBuilder.UseNpgsql(dbOptions.ConnectionString,
             sqlOptions => sqlOptions.CommandTimeout(dbOptions.TimeoutSeconds));
-    });
+    })
+    .AddScoped<RequestExt>();
 
 var authConfig = builder.Configuration.GetSection<AuthConfig>();
 

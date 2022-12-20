@@ -1,10 +1,22 @@
 ﻿@page "/"
 @using Tradibit.Client.Components
+@using Tradibit.Common.DTO.Dashboard
+@using Tradibit.Common.Interfaces.API
+@inject RequestExt _requestExt
+@inject IScenariosApi ScenariosApi
 
 <PageTitle>Dashboard</PageTitle>
 
-<UserFundsChart />
+<UserFundsChart UserFunds=""/>
 
-Welcome to your new app.
+@code {
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    private UserDashboard? _userDashboard;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _userDashboard = await _requestExt.Send(async () => await ScenariosApi.GetUserDashboard(new GetCurrentUserDashboardRequest()));
+        
+        await base.OnInitializedAsync();
+    }
+}

@@ -1,8 +1,10 @@
 ﻿using MediatR;
 using Tradibit.Common.DTO;
+using Tradibit.Common.DTO.Dashboard;
 using Tradibit.Common.DTO.Events;
 using Tradibit.Common.DTO.Events.Scenarios;
 using Tradibit.Common.DTO.Queries;
+using Tradibit.Common.DTO.Scenarios;
 using Tradibit.Common.Entities;
 using Tradibit.Common.Interfaces.API;
 
@@ -14,6 +16,9 @@ public class ScenariosController : TradibitBaseController, IScenariosApi
     {
     }
 
+    public async Task<Response<UserDashboard>> GetUserDashboard(GetCurrentUserDashboardRequest request) =>
+        await Send(request);
+    
     public async Task<Response<List<PagedResponse<Scenario>>>> GetScenarios(GetScenariosQuery query) =>
         await Send(query);
 

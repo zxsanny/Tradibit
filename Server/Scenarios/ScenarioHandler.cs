@@ -9,7 +9,7 @@ using Tradibit.DataAccess;
 namespace Tradibit.Api.Scenarios;
 
 public class ScenarioHandler : 
-    IRequestHandler<GetCurrentUserDashboard, UserDashboard>
+    IRequestHandler<GetCurrentUserDashboardRequest, UserDashboard>
 {
     private readonly ICurrentUserProvider _currentUserProvider;
     private readonly TradibitDb _db;
@@ -20,7 +20,7 @@ public class ScenarioHandler :
         _db = db;
     }
     
-    public async Task<UserDashboard> Handle(GetCurrentUserDashboard request, CancellationToken cancellationToken)
+    public async Task<UserDashboard> Handle(GetCurrentUserDashboardRequest request, CancellationToken cancellationToken)
     {
         var funds = await _db.UserFunds
             .Where(x => x.UserId == _currentUserProvider.CurrentUser.Id)

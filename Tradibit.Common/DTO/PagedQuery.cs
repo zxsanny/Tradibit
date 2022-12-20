@@ -1,4 +1,4 @@
-﻿namespace Tradibit.Common.DTO.Queries;
+﻿namespace Tradibit.Common.DTO;
 
 /// <summary> </summary>
 public abstract class PagedQuery
