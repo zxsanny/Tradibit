@@ -1,6 +1,7 @@
-﻿using Binance.Net.Enums;
+﻿using Tradibit.Common.DTO;
+using Tradibit.SharedUI.Primitives;
 
-namespace Tradibit.Common.DTO.Dashboard;
+namespace Tradibit.SharedUI.DTO.Dashboard;
 
 public class UserDashboard
 {

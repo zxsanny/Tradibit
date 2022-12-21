@@ -4,6 +4,7 @@ using Tradibit.Common.DTO;
 using Tradibit.Common.DTO.Dashboard;
 using Tradibit.Common.Interfaces;
 using Tradibit.DataAccess;
+using Tradibit.SharedUI.DTO;
 
 namespace Tradibit.Api.Scenarios;
 

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Tradibit.SharedUI.Primitives;
 
 namespace Tradibit.Common.DTO.Events.UserBroker;
 

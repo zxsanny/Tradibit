@@ -6,11 +6,12 @@ using MediatR;
 using Skender.Stock.Indicators;
 using Tradibit.Common;
 using Tradibit.Common.DTO;
-using Tradibit.Common.DTO.Coins;
 using Tradibit.Common.DTO.Events;
 using Tradibit.Common.DTO.Events.Scenarios;
 using Tradibit.Common.Extensions;
 using Tradibit.Common.Interfaces;
+using Tradibit.SharedUI.DTO.Coins;
+using Tradibit.SharedUI.Primitives;
 
 namespace Tradibit.Api.Services;
 
@@ -139,5 +140,5 @@ public class CandlesProvider : ICandlesProvider,
     }
 
     public decimal BtcValue => 
-        Quotes[new PairIntervalKey(new Pair(Currency.BTC, Currency.USDT), KlineInterval.FifteenMinutes)].LastOrDefault()?.Close ?? 0;
+        Quotes[new PairIntervalKey(new Pair(Currency.BTC, Currency.USDT), Interval.I_15_MIN)].LastOrDefault()?.Close ?? 0;
 }

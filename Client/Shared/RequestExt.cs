@@ -43,20 +43,18 @@ namespace Tradibit.Client.Shared
                     _navigation.NavigateTo("/Account/Login", true);
                 else
                 {
-                    await ShowError(e.Content ?? "", e.StackTrace ?? "");
+                    ShowError(e.Content ?? "", e.StackTrace ?? "");
                     return default;
                 }
             }
             if (resp?.Success ?? false)
                 return resp;
 
-            await ShowError(resp?.Message ?? "", resp?.StackTrace ?? "");
+            ShowError(resp?.Message ?? "", resp?.StackTrace ?? "");
             return default;
         }
-        
-#pragma warning disable CS1998
-        public async Task ShowError(string message, string stackTrace = null)
-#pragma warning restore CS1998
+
+        private void ShowError(string message, string? stackTrace = null)
         {
             var notificationMessage =
 #if DEBUG
@@ -75,10 +73,7 @@ namespace Tradibit.Client.Shared
                     Duration = TimeSpan.FromMilliseconds(30000).TotalMilliseconds
                 };
 #endif
-            //deliberately not awaiting
-#pragma warning disable CS4014
             _noticeService.Notify(notificationMessage);
-#pragma warning restore CS4014
         }
     }
 }

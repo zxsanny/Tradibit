@@ -1,5 +1,5 @@
-﻿using Binance.Net.Enums;
-using MediatR;
+﻿using MediatR;
+using Tradibit.SharedUI.Primitives;
 
 namespace Tradibit.Common.DTO.Events.Scenarios;
 
@@ -12,16 +12,16 @@ public class StartHistoryTestScenarioEvent : BaseScenarioEvent
     public decimal Deposit { get; set; }
     public TimeSpan HistorySpan { get; set; }
     public List<Pair> Pairs { get; set; }
-    public List<KlineInterval> Intervals { get; set; }
+    public List<Interval> Intervals { get; set; }
 }
 
 public class ReplyHistoryEvent : BaseScenarioEvent
 {
     public TimeSpan HistorySpan { get; set; }
     public List<Pair> Pairs { get; set; }
-    public List<KlineInterval> Intervals { get; set; }
+    public List<Interval> Intervals { get; set; }
 
-    public ReplyHistoryEvent(TimeSpan historySpan, List<Pair> pairs, List<KlineInterval> intervals)
+    public ReplyHistoryEvent(TimeSpan historySpan, List<Pair> pairs, List<Interval> intervals)
     {
         HistorySpan = historySpan;
         Pairs = pairs;

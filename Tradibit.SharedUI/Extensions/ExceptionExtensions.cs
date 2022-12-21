@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Tradibit.Common.Extensions;
+namespace Tradibit.SharedUI.Extensions;
 
 /// <summary> Exceptions extensions </summary>
 public static class ExceptionExtensions

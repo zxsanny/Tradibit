@@ -1,7 +1,4 @@
-﻿using Skender.Stock.Indicators;
-using Tradibit.Common.DTO;
-
-namespace Tradibit.Common.Entities;
+﻿namespace Tradibit.Common.Entities;
 
 public class Scenario : BaseTrackableId
 {

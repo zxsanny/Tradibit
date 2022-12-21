@@ -1,6 +1,8 @@
 ﻿using MediatR;
+using Tradibit.Common.DTO;
+using Tradibit.SharedUI.Primitives;
 
-namespace Tradibit.Common.DTO.Coins;
+namespace Tradibit.SharedUI.DTO.Coins;
 
 public class GetMostCapCoinsRequest : IRequest<List<Pair>>
 {

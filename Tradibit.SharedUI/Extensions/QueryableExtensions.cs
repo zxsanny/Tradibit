@@ -1,8 +1,7 @@
 ﻿using System.Linq.Expressions;
-using Loyalty.SharedUI.Common;
-using Loyalty.SharedUI.Enums;
+using Tradibit.Common.DTO;
 
-namespace Loyalty.SharedUI.Extensions;
+namespace Tradibit.SharedUI.Extensions;
 
 /// <summary> </summary>
 public static class QueryableExtensions
@@ -60,59 +59,7 @@ public static class QueryableExtensions
         return source.Where(expr);
     }
     
-      /// <summary>
-    /// Applies DatePeriodDto to source query
-    /// </summary>
-    /// <param name="source">source query</param>
-    /// <param name="startSelector">f.e. x => x.StartDate</param>
-    /// <param name="endSelector">f.e. x => x.EndDate</param>
-    /// <param name="datePeriod">DatePeriodDto, f.e. 2022-01-01 to 2022-02-01</param>
-    /// <returns>IQueryable with applied Where(x => x.StartDate >= 2022-01-01).Where(x.EndDate < 2022-02-01)</returns>
-    public static IQueryable<T> WhereDatesRange<T>(this IQueryable<T> source,
-        Expression<Func<T, DateTime?>> startSelector,
-        Expression<Func<T, DateTime?>> endSelector,
-        DatePeriodDto datePeriod)
-    {
-        if (datePeriod is { From: { } })
-            source = source.Where(CreateComparisonExpression(startSelector, datePeriod.From, ComparisonEnum.GreaterThanOrEqualTo));
-        
-        if (datePeriod is { To: { } })
-            source = source.Where(CreateComparisonExpression(endSelector, datePeriod.To, ComparisonEnum.LessThan));
-        
-        return source;
-    }
-
-      private static Expression<Func<T, bool>> CreateComparisonExpression<T, TValue>(Expression<Func<T, TValue>> selector, TValue val, ComparisonEnum comparison)
-      {
-          try
-          {
-              var parameter = selector.Parameters.FirstOrDefault();
-              var member = selector.Body;
-              var valueExpr = Expression.Convert(Expression.Constant(val), member.Type);
-
-              var body = comparison switch
-              {
-                  ComparisonEnum.EqualTo => Expression.Equal(member, valueExpr),
-                  ComparisonEnum.NotEqualTo => Expression.NotEqual(member, valueExpr),
-
-                  ComparisonEnum.GreaterThan => Expression.GreaterThan(member, valueExpr),
-                  ComparisonEnum.GreaterThanOrEqualTo => Expression.GreaterThanOrEqual(member, valueExpr),
-
-                  ComparisonEnum.LessThan => Expression.LessThan(member, valueExpr),
-                  ComparisonEnum.LessThanOrEqualTo => Expression.LessThanOrEqual(member, valueExpr),
-                  _ => throw new ArgumentOutOfRangeException(nameof(comparison), comparison, null)
-              };
-              var result = Expression.Lambda<Func<T, bool>>(body, parameter);
-              return result;
-          }
-          catch (Exception e)
-          {
-              Console.WriteLine(e);
-              throw;
-          }
-      }
-
-      /// <summary>Checks whether object = one of element of the list </summary>
+    /// <summary>Checks whether object = one of element of the list </summary>
     public static bool IsOneOf<T>(this T obj, params T[] objects) =>
         objects.Contains(obj);
 

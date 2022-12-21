@@ -2,20 +2,23 @@
 @using Tradibit.Client.Components
 @using Tradibit.Common.DTO.Dashboard
 @using Tradibit.Common.Interfaces.API
-@inject RequestExt _requestExt
+
+@inject RequestExt RequestExt
 @inject IScenariosApi ScenariosApi
 
 <PageTitle>Dashboard</PageTitle>
 
-<UserFundsChart UserFunds=""/>
+<UserFundsChart 
+    UserFunds="_userDashboard?.UserFunds"
+    UserStat="_userDashboard?.UserStat" />
 
 @code {
 
-    private UserDashboard? _userDashboard;
+    private UserDashboard? _userDashboard = new();
     
     protected override async Task OnInitializedAsync()
     {
-        _userDashboard = await _requestExt.Send(async () => await ScenariosApi.GetUserDashboard(new GetCurrentUserDashboardRequest()));
+        _userDashboard = await RequestExt.Send(async () => await ScenariosApi.GetUserDashboard(new GetCurrentUserDashboardRequest()));
         
         await base.OnInitializedAsync();
     }

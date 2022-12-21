@@ -1,14 +1,14 @@
-﻿using System.Collections.Concurrent;
-using Binance.Net.Enums;
+﻿using Binance.Net.Enums;
 using Binance.Net.Objects.Models.Spot.Socket;
 using CryptoExchange.Net.Sockets;
 using MediatR;
 using Tradibit.Common.DTO;
-using Tradibit.Common.DTO.Coins;
 using Tradibit.Common.DTO.Events;
 using Tradibit.Common.DTO.Events.UserBroker;
-using Tradibit.Common.Interfaces;
 using Tradibit.DataAccess;
+using Tradibit.SharedUI.DTO.Coins;
+using Tradibit.SharedUI.Primitives;
+using OrderSide = Binance.Net.Enums.OrderSide;
 
 namespace Tradibit.Api.Services;
 

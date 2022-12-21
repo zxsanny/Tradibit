@@ -1,14 +1,10 @@
-﻿using Newtonsoft.Json;
-using Tradibit.Common.Extensions;
-
-namespace Tradibit.Common.DTO;
+﻿namespace Tradibit.SharedUI.DTO;
 
 public class Response
 {
     public bool Success { get; set; }
     public string Message { get; set; }
     
-    [JsonProperty(NullValueHandling=NullValueHandling.Ignore)]
     public string StackTrace { get; set; }
         
     public Response()

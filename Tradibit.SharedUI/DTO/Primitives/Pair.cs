@@ -1,4 +1,4 @@
-﻿namespace Tradibit.Common.DTO;
+﻿namespace Tradibit.SharedUI.Primitives;
 
 public class Pair  : IEquatable<Pair>
 {

@@ -1,12 +1,10 @@
-﻿using Binance.Net.Clients;
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.Options;
 using Tradibit.Common;
 using Tradibit.Common.DTO;
-using Tradibit.Common.DTO.Coins;
-using Tradibit.Common.DTO.Events;
-using Tradibit.Common.Interfaces;
 using Tradibit.Common.SettingsDTO;
+using Tradibit.SharedUI.DTO.Coins;
+using Tradibit.SharedUI.Primitives;
 
 namespace Tradibit.Api.Services;
 

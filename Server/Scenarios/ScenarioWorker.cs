@@ -8,6 +8,7 @@ using Tradibit.Common.DTO.Events.UserBroker;
 using Tradibit.Common.Entities;
 using Tradibit.Common.Interfaces;
 using Tradibit.DataAccess;
+using Tradibit.SharedUI.Primitives;
 
 namespace Tradibit.Api.Scenarios;
 

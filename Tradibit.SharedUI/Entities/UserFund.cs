@@ -1,6 +1,7 @@
 ﻿using Tradibit.Common.DTO;
+using Tradibit.Common.Entities;
 
-namespace Tradibit.Common.Entities;
+namespace Tradibit.SharedUI.Entities;
 
 public class UserFund : BaseTrackableId 
 {

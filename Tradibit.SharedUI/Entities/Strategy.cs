@@ -3,6 +3,8 @@ using System.Security.AccessControl;
 using Binance.Net.Enums;
 using Tradibit.Common.DTO;
 using Tradibit.Common.Interfaces;
+using Tradibit.SharedUI.DTO;
+using Tradibit.SharedUI.Primitives;
 
 namespace Tradibit.Common.Entities;
 

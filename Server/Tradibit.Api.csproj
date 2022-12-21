@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Client\Tradibit.Client.csproj" />
     <ProjectReference Include="..\Tradibit.DataAccess\Tradibit.DataAccess.csproj" />
+    <ProjectReference Include="..\Tradibit.SharedUI\Tradibit.SharedUI.csproj" />
   </ItemGroup>
 
 

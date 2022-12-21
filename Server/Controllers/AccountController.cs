@@ -9,6 +9,7 @@ using Tradibit.Common.DTO.Events;
 using Tradibit.Common.DTO.Queries;
 using Tradibit.Common.Interfaces.API;
 using Tradibit.Common.SettingsDTO;
+using Tradibit.SharedUI.Interfaces.API;
 
 namespace Tradibit.Api.Controllers;
 
