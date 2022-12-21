@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Tradibit.Common.DTO;
 using Tradibit.Common.DTO.Dashboard;
-using Tradibit.Common.Entities;
 using Tradibit.Common.Interfaces;
 using Tradibit.DataAccess;
 

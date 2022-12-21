@@ -8,6 +8,7 @@ using Tradibit.Api.Services;
 using Tradibit.Client.Shared;
 using Tradibit.Common.Extensions;
 using Tradibit.Common.Interfaces;
+using Tradibit.Common.Interfaces.API;
 using Tradibit.Common.SettingsDTO;
 using Tradibit.DataAccess;
 
@@ -21,14 +22,14 @@ builder.Services.AddRazorPages();
 builder.Services
     .ConfigSection<MainTradingSettings>(builder.Configuration)
     .ConfigSection<AuthConfig>(builder.Configuration)
-    
+
     .AddHttpContextAccessor()
     .AddMediatR(AssemblyExt.GetAllOwnReferencedAssemblies())
-    
+
     .AddSingleton<IClientHolder, ClientHolder>()
     .AddSingleton<ICandlesProvider, CandlesProvider>()
     .AddSingleton<ICurrentUserProvider, CurrentUserProvider>()
-    
+
     .AddDbContext<TradibitDb>((serviceProvider, optionsBuilder) =>
     {
         var dbOptions = serviceProvider.GetService<IOptions<DatabaseOptions>>()?.Value;
@@ -37,8 +38,7 @@ builder.Services
 
         optionsBuilder.UseNpgsql(dbOptions.ConnectionString,
             sqlOptions => sqlOptions.CommandTimeout(dbOptions.TimeoutSeconds));
-    })
-    .AddScoped<RequestExt>();
+    });
 
 var authConfig = builder.Configuration.GetSection<AuthConfig>();
 
