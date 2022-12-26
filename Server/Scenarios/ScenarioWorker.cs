@@ -1,14 +1,14 @@
 ﻿using System.Collections.Concurrent;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Tradibit.Common.DTO;
-using Tradibit.Common.DTO.Events;
-using Tradibit.Common.DTO.Events.Scenarios;
-using Tradibit.Common.DTO.Events.UserBroker;
-using Tradibit.Common.Entities;
-using Tradibit.Common.Interfaces;
 using Tradibit.DataAccess;
-using Tradibit.SharedUI.Primitives;
+using Tradibit.Shared.Entities;
+using Tradibit.SharedUI.DTO;
+using Tradibit.SharedUI.DTO.Primitives;
+using Tradibit.SharedUI.DTO.Scenarios;
+using Tradibit.SharedUI.DTO.UserBroker;
+using Tradibit.SharedUI.DTO.Users;
+using Tradibit.SharedUI.Interfaces;
 
 namespace Tradibit.Api.Scenarios;
 
@@ -38,21 +38,22 @@ public class ScenarioWorker :
     public async Task<Unit> Handle(StartScenarioEvent request, CancellationToken cancellationToken)
     {
         var scenario = await _db.Scenarios.FindAsync(request.ScenarioId, cancellationToken);
-        var balances = await _mediator.Send(new GetBalancesEvent(request.UserId, Currency.USDT), cancellationToken);
-
-        var usdt = balances.FirstOrDefault(x => x.Key == Currency.USDT).Value;
-        if (usdt < 100)
-            throw new Exception("No USDT funds found or USDT funds < $100");
         
-        var totalFundsBtc = balances.Aggregate(0m, (s, balance) => s + balance.Value);
-        var totalUSDT = _candlesProvider.BtcValue * totalFundsBtc;
-        var requiredUSDT = totalUSDT * scenario.DepositPercent / 100;
-
-        if (usdt < requiredUSDT)
-            throw new Exception($"Available USDT funds is less then required USDT for the scenario! " +
-                                $"Available USDT: {usdt}. Required for scenario: {requiredUSDT}, scenario percent: {scenario.DepositPercent}%");
-            
-        StartScenario(false, scenario, requiredUSDT, cancellationToken);
+        // var balances = await _mediator.Send(new GetBalancesEvent(request.UserId, Currency.USDT), cancellationToken);
+        //
+        // var usdt = balances.FirstOrDefault(x => x.Key == Currency.USDT).Value;
+        // if (usdt < 100)
+        //     throw new Exception("No USDT funds found or USDT funds < $100");
+        //
+        // var totalFundsBtc = balances.Aggregate(0m, (s, balance) => s + balance.Value);
+        // var totalUSDT = _candlesProvider.BtcValue * totalFundsBtc;
+        // var requiredUSDT = totalUSDT * scenario.DepositPercent / 100;
+        //
+        // if (usdt < requiredUSDT)
+        //     throw new Exception($"Available USDT funds is less then required USDT for the scenario! " +
+        //                         $"Available USDT: {usdt}. Required for scenario: {requiredUSDT}, scenario percent: {scenario.DepositPercent}%");
+        //     
+        //StartScenario(false, scenario, requiredUSDT, cancellationToken);
         return Unit.Value;
     }
 
@@ -66,13 +67,13 @@ public class ScenarioWorker :
 
     private void StartScenario(bool isHistory, Scenario scenario, decimal deposit, CancellationToken cancellationToken = default)
     {
-        scenario.State = new ScenarioState
-        {
-            DepositMoney = deposit,
-            CurrentStepId = scenario.InitialStep
-        };
-        var scenarios = isHistory ? ReplyHistoryScenariosDict : ActiveScenariosDict;
-        scenarios.TryAdd(scenario.Id, scenario);
+        // scenario.State = new ScenarioState
+        // {
+        //     DepositMoney = deposit,
+        //     CurrentStepId = scenario.InitialStep
+        // };
+        // var scenarios = isHistory ? ReplyHistoryScenariosDict : ActiveScenariosDict;
+        //scenarios.TryAdd(scenario.Id, scenario);
     }
 
     public async Task Handle(UserLoginEvent notification, CancellationToken cancellationToken)
@@ -97,20 +98,20 @@ public class ScenarioWorker :
 
     private async Task MoveNext(Scenario scenario, QuoteIndicator quoteIndicator, CancellationToken cancellationToken)
     {
-        bool transited;
-        do //could be multiple transition on 1 Kline update
-        {
-            transited = false;
-            foreach (var transition in scenario.CurrentStep.Transitions)
-            {
-                transited = await transition.TryTransit(scenario, quoteIndicator);
-                if (transited)
-                {
-                    await _db.Save(scenario, cancellationToken);
-                    break;
-                }
-            }
-        } while (transited);
+        // bool transited;
+        // do //could be multiple transition on 1 Kline update
+        // {
+        //     transited = false;
+        //     foreach (var transition in scenario.CurrentStep.Transitions)
+        //     {
+        //         transited = await transition.TryTransit(scenario, quoteIndicator);
+        //         if (transited)
+        //         {
+        //             await _db.Save(scenario, cancellationToken);
+        //             break;
+        //         }
+        //     }
+        // } while (transited);
     }
 
 
@@ -128,6 +129,6 @@ public class ScenarioWorker :
     {
         var scenarios = request.IsHistory ? ReplyHistoryScenariosDict : ActiveScenariosDict;
         scenarios.TryRemove(request.ScenarioId, out _);
-        return Unit.Value;
+        return await Task.FromResult(Unit.Value);
     }
 }

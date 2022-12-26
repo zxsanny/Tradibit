@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using Tradibit.SharedUI.Primitives;
+using Tradibit.SharedUI.DTO.Primitives;
 
-namespace Tradibit.Common.DTO.Events;
+namespace Tradibit.SharedUI.DTO;
 
 public class KlineUpdateEvent : IRequest<Unit>
 {

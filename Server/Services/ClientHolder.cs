@@ -2,9 +2,8 @@
 using Binance.Net.Clients;
 using Binance.Net.Objects.Models.Spot.Socket;
 using CryptoExchange.Net.Sockets;
-using Tradibit.Common.Entities;
-using Tradibit.Common.Interfaces;
 using Tradibit.DataAccess;
+using Tradibit.Shared.Entities;
 
 namespace Tradibit.Api.Services;
 

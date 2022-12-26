@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using Tradibit.SharedUI.Primitives;
+using Tradibit.SharedUI.DTO.Primitives;
 
-namespace Tradibit.Common.DTO.Events.Scenarios;
+namespace Tradibit.SharedUI.DTO.Scenarios;
 
 public class StartScenarioEvent : BaseScenarioEvent
 {
@@ -11,15 +11,15 @@ public class StartHistoryTestScenarioEvent : BaseScenarioEvent
 {
     public decimal Deposit { get; set; }
     public TimeSpan HistorySpan { get; set; }
-    public List<Pair> Pairs { get; set; }
-    public List<Interval> Intervals { get; set; }
+    public List<Pair>? Pairs { get; set; }
+    public List<Interval>? Intervals { get; set; }
 }
 
 public class ReplyHistoryEvent : BaseScenarioEvent
 {
     public TimeSpan HistorySpan { get; set; }
-    public List<Pair> Pairs { get; set; }
-    public List<Interval> Intervals { get; set; }
+    public List<Pair>? Pairs { get; set; }
+    public List<Interval>? Intervals { get; set; }
 
     public ReplyHistoryEvent(TimeSpan historySpan, List<Pair> pairs, List<Interval> intervals)
     {

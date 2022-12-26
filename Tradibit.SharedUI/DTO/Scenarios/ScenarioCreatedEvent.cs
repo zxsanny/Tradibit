@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Tradibit.Common.DTO.Events.Scenarios;
+namespace Tradibit.SharedUI.DTO.Scenarios;
 
 public class ScenarioCreatedEvent : IRequest<Unit>
 {

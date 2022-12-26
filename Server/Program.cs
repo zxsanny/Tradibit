@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Tradibit.Api.Services;
 using Tradibit.Client.Shared;
-using Tradibit.Common.Extensions;
-using Tradibit.Common.Interfaces;
-using Tradibit.Common.Interfaces.API;
-using Tradibit.Common.SettingsDTO;
 using Tradibit.DataAccess;
+using Tradibit.Shared.Extensions;
+using Tradibit.Shared.MappingProfiles;
+using Tradibit.SharedUI.DTO.SettingsDTO;
+using Tradibit.SharedUI.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +25,7 @@ builder.Services
 
     .AddHttpContextAccessor()
     .AddMediatR(AssemblyExt.GetAllOwnReferencedAssemblies())
+    .AddAutoMapper(typeof(BinanceProfile).Assembly)
 
     .AddSingleton<IClientHolder, ClientHolder>()
     .AddSingleton<ICandlesProvider, CandlesProvider>()

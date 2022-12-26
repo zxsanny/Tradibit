@@ -1,4 +1,4 @@
-﻿namespace Tradibit.SharedUI.DTO;
+﻿namespace Tradibit.SharedUI.DTO.Primitives;
 
 public enum QuoteEnum
 {

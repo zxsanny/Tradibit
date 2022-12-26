@@ -1,8 +1,8 @@
-﻿using Tradibit.Common.Entities;
+﻿using Tradibit.SharedUI.DTO.Users;
 
-namespace Tradibit.Common.Interfaces;
+namespace Tradibit.SharedUI.Interfaces;
 
 public interface ICurrentUserProvider
 {
-    User CurrentUser { get; }
+    UserDto CurrentUser { get; }
 }

@@ -1,10 +1,9 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Tradibit.Common.DTO;
-using Tradibit.Common.DTO.Dashboard;
-using Tradibit.Common.Interfaces;
 using Tradibit.DataAccess;
 using Tradibit.SharedUI.DTO;
+using Tradibit.SharedUI.DTO.Dashboard;
+using Tradibit.SharedUI.Interfaces;
 
 namespace Tradibit.Api.Scenarios;
 

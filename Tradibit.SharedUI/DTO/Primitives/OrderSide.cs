@@ -1,4 +1,4 @@
-﻿namespace Tradibit.SharedUI.Primitives;
+﻿namespace Tradibit.SharedUI.DTO.Primitives;
 
 public enum OrderSide
 {

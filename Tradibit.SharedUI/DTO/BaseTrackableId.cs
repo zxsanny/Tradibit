@@ -1,4 +1,4 @@
-﻿namespace Tradibit.Common.Entities;
+﻿namespace Tradibit.SharedUI.DTO;
 
 public abstract class BaseTrackableId
 {

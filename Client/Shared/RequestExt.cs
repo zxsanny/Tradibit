@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using Radzen;
 using Refit;
-using Tradibit.Common.DTO;
+using Tradibit.SharedUI.DTO;
 
 namespace Tradibit.Client.Shared
 {

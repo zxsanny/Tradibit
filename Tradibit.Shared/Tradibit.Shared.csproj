@@ -4,7 +4,6 @@
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
-        <RootNamespace>Tradibit.Common</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,12 +16,19 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="AutoMapper" Version="11.0.1" />
+      <PackageReference Include="AutoMapper.Extensions.EnumMapping" Version="2.0.1" />
       <PackageReference Include="Binance.Net" Version="8.2.0" />
+      <PackageReference Include="MediatR" Version="11.0.0" />
       <PackageReference Include="MediatR.Contracts" Version="1.0.1" />
       <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
       <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
       <PackageReference Include="Skender.Stock.Indicators" Version="2.4.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Tradibit.SharedUI\Tradibit.SharedUI.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,14 +1,14 @@
 ﻿using System.Security.Claims;
 using System.Text.Json;
 using Blazored.LocalStorage;
-using Microsoft.VisualBasic;
-using Tradibit.Client.Shared;
-using Tradibit.Common.Interfaces.API;
 using Microsoft.AspNetCore.Components.Authorization;
+using Tradibit.Client.Shared;
+using Tradibit.SharedUI;
+using Tradibit.SharedUI.Extensions;
 using Tradibit.SharedUI.Interfaces;
 using Tradibit.SharedUI.Interfaces.API;
 
-namespace Loyalty.AdminApi.Web.Security
+namespace Tradibit.Client
 {
     public class TokenAuthenticationStateProvider : AuthenticationStateProvider, ITokenProvider
     {
@@ -37,7 +37,7 @@ namespace Loyalty.AdminApi.Web.Security
             }
         }
 
-        public async Task<string> GetToken()
+        public async Task<string?> GetToken()
         {
             var token = await _localStorage.GetItemAsync<string>(Constants.AUTH_TOKEN_KEY) ?? await GetTokenFromApi();
             var claims = ParseClaimsFromJwt(token).ToList();
@@ -51,9 +51,9 @@ namespace Loyalty.AdminApi.Web.Security
         public async Task<IEnumerable<Claim>> GetClaims() => 
             ParseClaimsFromJwt(await GetToken());
 
-        private async Task<string> GetTokenFromApi()
+        private async Task<string?> GetTokenFromApi()
         {
-            var token = await _requestExt.Send(_accountApi.GetCurrentUserToken);
+            var token = await _requestExt.Send(async () => await _accountApi.GetCurrentUserToken());
             if (!string.IsNullOrEmpty(token))
                 await _localStorage.SetItemAsync(Constants.AUTH_TOKEN_KEY, token);
             
@@ -65,7 +65,7 @@ namespace Loyalty.AdminApi.Web.Security
             return claims.Any(x => x.Type == "UserRoleId" && x.Value == "1");
         }
 
-        private IEnumerable<Claim> ParseClaimsFromJwt(string jwt)
+        private IEnumerable<Claim> ParseClaimsFromJwt(string? jwt)
         {
             if (string.IsNullOrEmpty(jwt) || !jwt.Contains('.'))
                 return new List<Claim>();
@@ -86,21 +86,21 @@ namespace Loyalty.AdminApi.Web.Security
             keyValuePairs.TryGetValue(ClaimTypes.Role, out var roles);
             if (roles != null)
             {
-                if (roles?.ToString()?.Trim().StartsWith("[") ?? false)
+                if (roles.ToString()?.Trim().StartsWith("[") ?? false)
                 {
-                    var parsedRoles = JsonSerializer.Deserialize<string[]>(roles.ToString());
-                    foreach (var parsedRole in parsedRoles) 
+                    var parsedRoles = JsonSerializer.Deserialize<string[]>(roles.ToString()!);
+                    foreach (var parsedRole in parsedRoles!)
                         claims.Add(new Claim(ClaimTypes.Role, parsedRole));
                 }
                 else
                 {
-                    claims.Add(new Claim(ClaimTypes.Role, roles.ToString()));
+                    claims.Add(new Claim(ClaimTypes.Role, roles.ToString()!));
                 }
 
                 keyValuePairs.Remove(ClaimTypes.Role);
             }
-
-            claims.AddRange(keyValuePairs.Select(kvp => new Claim(kvp.Key, kvp.Value?.ToString() ?? "")));
+            
+            claims.AddRange(keyValuePairs.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString() ?? "")));
             return claims;
         }
     }

@@ -1,7 +1,7 @@
-using Tradibit.Common.DTO;
-using Tradibit.Common.DTO.Dashboard;
+using Tradibit.SharedUI.DTO;
+using Tradibit.SharedUI.DTO.Dashboard;
 
-namespace Tradibit.Common.Interfaces.API;
+namespace Tradibit.SharedUI.Interfaces.API;
 
 public interface IScenariosApi
 {

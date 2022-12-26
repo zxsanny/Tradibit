@@ -1,4 +1,4 @@
-namespace Tradibit.Common.Entities;
+namespace Tradibit.Shared.Entities;
 
 public class ScenarioOperation
 {

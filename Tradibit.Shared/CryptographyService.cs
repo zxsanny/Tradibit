@@ -1,7 +1,8 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using Tradibit.SharedUI;
 
-namespace Tradibit.Common;
+namespace Tradibit.Shared;
 
 public class EncryptionService
 {

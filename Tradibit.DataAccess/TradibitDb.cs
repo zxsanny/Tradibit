@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Tradibit.Common.Entities;
 using Tradibit.DataAccess.Configuration;
+using Tradibit.Shared.Entities;
 
 namespace Tradibit.DataAccess;
 

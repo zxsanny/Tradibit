@@ -1,4 +1,6 @@
-﻿namespace Tradibit.Common.Entities;
+﻿using Tradibit.SharedUI.DTO;
+
+namespace Tradibit.Shared.Entities;
 
 //public - open to use for everyone 
 //private - record in this table with CanEdit true

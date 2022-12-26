@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
-using Tradibit.Common.DTO;
+using Tradibit.SharedUI.DTO;
+using Tradibit.SharedUI.DTO.Primitives;
 
 namespace Tradibit.SharedUI.Extensions;
 
@@ -13,7 +14,7 @@ public static class QueryableExtensions
     /// </summary>
     public static IQueryable<TSource> WhereIf<TSource>(this IQueryable<TSource> query, bool? condition,
         Expression<Func<TSource, bool>> truePredicate,
-        Expression<Func<TSource, bool>> falsePredicate = null)
+        Expression<Func<TSource, bool>>? falsePredicate = null)
     {
         if (!condition.HasValue)
             return query;
@@ -30,7 +31,7 @@ public static class QueryableExtensions
     /// <summary> If statement for more readable flow </summary>
     public static TRes If<TSource, TRes>(this TSource source, bool? condition,
         Func<TSource, TRes> trueFn, 
-        Func<TSource, TRes> falseFn = null) where TSource : TRes =>
+        Func<TSource, TRes>? falseFn = null) where TSource : TRes =>
         condition.HasValue
             ? condition.Value
                 ? trueFn(source)
@@ -64,19 +65,19 @@ public static class QueryableExtensions
         objects.Contains(obj);
 
     /// <summary>Apply pagination: Gets selected page by PageNumber and PageSize</summary>
-    public static IQueryable<T> ApplyPagination<T>(this IQueryable<T> source, PagedQuery query) =>
-        source.Skip((query.PageNumber - 1) * query.PageSize)
-            .Take(query.PageSize);
+    public static IQueryable<T> ApplyPagination<T>(this IQueryable<T> source, PagedRequest request) =>
+        source.Skip((request.PageNumber - 1) * request.PageSize)
+            .Take(request.PageSize);
 
     /// <summary> Apply sorting: query.OrderBy(x => x.FieldName), if sortedQuery.SortDirection = Descending then .OrderByDescending  </summary>
-    public static IQueryable<TSource> ApplyOrdering<TSource>(this IQueryable<TSource> query, PagedSortedQuery sortedQuery)
+    public static IQueryable<TSource> ApplyOrdering<TSource>(this IQueryable<TSource> query, PagedSortedRequest sortedRequest)
     {
-        if (string.IsNullOrEmpty(sortedQuery.FieldName) || sortedQuery.SortDirection == SortDirection.Default)
+        if (string.IsNullOrEmpty(sortedRequest.FieldName) || sortedRequest.SortDirection == SortDirection.Default)
             return query;
 
-        var lambda = (dynamic)CreateExpression(typeof(TSource), sortedQuery.FieldName);
+        var lambda = (dynamic)CreateExpression(typeof(TSource), sortedRequest.FieldName);
 
-        return sortedQuery.SortDirection switch
+        return sortedRequest.SortDirection switch
         {
             SortDirection.Ascending => Queryable.OrderBy(query, lambda),
             SortDirection.Descending => Queryable.OrderByDescending(query, lambda),

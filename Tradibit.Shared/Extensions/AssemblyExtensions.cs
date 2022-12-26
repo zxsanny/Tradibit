@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Tradibit.Common.Extensions;
+namespace Tradibit.Shared.Extensions;
 
 /// <summary> </summary>
 public static class AssemblyExt

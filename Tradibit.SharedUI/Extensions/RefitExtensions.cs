@@ -4,18 +4,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.VisualBasic;
 using Refit;
+using Tradibit.SharedUI.Interfaces;
 
 namespace Tradibit.SharedUI.Extensions;
 
 public static class RefitExtensions
 {
-    private static IServiceCollection AddRefit<T>(this IServiceCollection services, string baseUrl, bool isBearer = false, bool isHmac = false) where T : class
+    public static IServiceCollection AddRefit<T>(this IServiceCollection services, string apiUrl, bool isBearer = false, bool isHmac = false) where T : class
     {
         if (isBearer) 
             services.TryAddTransient<UserBearerAuthenticationHandler>();
 
         services.AddRefitClient<T>()
-            .ConfigureHttpClient(c => c.BaseAddress = new Uri(baseUrl))
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiUrl))
             .AddHttpMessageHandler<UserBearerAuthenticationHandler>();
         return services;
     }

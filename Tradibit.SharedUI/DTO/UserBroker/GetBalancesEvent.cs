@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using Tradibit.SharedUI.Primitives;
+using Tradibit.SharedUI.DTO.Primitives;
 
-namespace Tradibit.Common.DTO.Events.UserBroker;
+namespace Tradibit.SharedUI.DTO.UserBroker;
 
 public class GetBalancesEvent : IRequest<Dictionary<Currency, decimal>>
 {

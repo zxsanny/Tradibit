@@ -1,4 +1,4 @@
-﻿namespace Tradibit.SharedUI.Primitives;
+﻿namespace Tradibit.SharedUI.DTO.Primitives;
 
 public class Pair  : IEquatable<Pair>
 {
@@ -30,7 +30,7 @@ public class Pair  : IEquatable<Pair>
         return new Pair(strs[0], strs[1]);
     }
     
-    public static bool operator ==(Pair pair1, Pair pair2)
+    public static bool operator ==(Pair? pair1, Pair? pair2)
     {
         if (pair1 is null)
             return pair2 is null;
@@ -41,14 +41,14 @@ public class Pair  : IEquatable<Pair>
     public static bool operator !=(Pair pair1, Pair pair2) =>
         !(pair1 == pair2);
     
-    public bool Equals(Pair other)
+    public bool Equals(Pair? other)
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
         return Equals(_baseCurrency, other._baseCurrency) && Equals(_quoteCurrency, other._quoteCurrency);
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj)) return false;
         if (ReferenceEquals(this, obj)) return true;
@@ -74,7 +74,7 @@ public class Currency : IEquatable<Currency>
 
     public override string ToString() => Value;
 
-    public static bool operator ==(Currency currency1, Currency currency2)
+    public static bool operator ==(Currency currency1, Currency? currency2)
     {
         if (currency1 is null)
             return currency2 is null;
@@ -85,11 +85,11 @@ public class Currency : IEquatable<Currency>
     public static bool operator !=(Currency currency1, Currency currency2) =>
         !(currency1 == currency2);
 
-    public bool Equals(Currency other) =>
+    public bool Equals(Currency? other) =>
         Value.Equals(other?.Value);
 
-    public override bool Equals(object obj) =>
-        Equals((Currency)obj);
+    public override bool Equals(object? obj) =>
+        Equals((Currency?)obj);
 
     public override int GetHashCode() =>
         Value.GetHashCode();

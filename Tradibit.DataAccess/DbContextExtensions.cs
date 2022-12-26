@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Tradibit.Common.Entities;
+using Tradibit.SharedUI.DTO;
 
 namespace Tradibit.DataAccess;
 

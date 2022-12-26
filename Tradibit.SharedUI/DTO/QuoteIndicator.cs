@@ -1,6 +1,6 @@
-﻿using Skender.Stock.Indicators;
+﻿using Tradibit.SharedUI.DTO.Primitives;
 
-namespace Tradibit.Common.DTO;
+namespace Tradibit.SharedUI.DTO;
 
 public class QuoteIndicator
 {

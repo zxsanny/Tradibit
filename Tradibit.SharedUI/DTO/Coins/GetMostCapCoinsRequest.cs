@@ -1,6 +1,5 @@
 ﻿using MediatR;
-using Tradibit.Common.DTO;
-using Tradibit.SharedUI.Primitives;
+using Tradibit.SharedUI.DTO.Primitives;
 
 namespace Tradibit.SharedUI.DTO.Coins;
 

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Tradibit.Common.DTO;
+namespace Tradibit.SharedUI.DTO.Primitives;
 
 public enum SortDirection
 {

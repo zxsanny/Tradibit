@@ -1,12 +1,12 @@
 using MediatR;
-using Tradibit.SharedUI.Primitives;
+using Tradibit.SharedUI.DTO.Primitives;
 
-namespace Tradibit.Common.DTO.Events.UserBroker;
+namespace Tradibit.SharedUI.DTO.UserBroker;
 
 public abstract class BaseOrderEvent : IRequest<decimal>
 {
     public Guid UserId { get; set; }
-    public Pair Pair { get; set; }
+    public Pair? Pair { get; set; }
     public decimal Amount { get; set; }
 }
 

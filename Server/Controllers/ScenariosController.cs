@@ -1,12 +1,9 @@
 ﻿using MediatR;
-using Tradibit.Common.DTO;
-using Tradibit.Common.DTO.Dashboard;
-using Tradibit.Common.DTO.Events;
-using Tradibit.Common.DTO.Events.Scenarios;
-using Tradibit.Common.DTO.Queries;
-using Tradibit.Common.DTO.Scenarios;
-using Tradibit.Common.Entities;
-using Tradibit.Common.Interfaces.API;
+using Tradibit.Shared.Entities;
+using Tradibit.SharedUI.DTO;
+using Tradibit.SharedUI.DTO.Dashboard;
+using Tradibit.SharedUI.DTO.Scenarios;
+using Tradibit.SharedUI.Interfaces.API;
 
 namespace Tradibit.Api.Controllers;
 
@@ -19,8 +16,8 @@ public class ScenariosController : TradibitBaseController, IScenariosApi
     public async Task<Response<UserDashboard>> GetUserDashboard(GetCurrentUserDashboardRequest request) =>
         await Send(request);
     
-    public async Task<Response<List<PagedResponse<Scenario>>>> GetScenarios(GetScenariosQuery query) =>
-        await Send(query);
+    public async Task<Response<List<PagedResponse<ScenarioDto>>>> GetScenarios(GetScenariosRequest request) =>
+        await Send(request);
 
     public async Task<Response> CreateScenario(ScenarioCreatedEvent command) =>
         await Send(command);

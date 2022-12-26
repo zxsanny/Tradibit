@@ -1,12 +1,11 @@
 using System.ComponentModel.DataAnnotations;
-using System.Security.AccessControl;
-using Binance.Net.Enums;
-using Tradibit.Common.DTO;
-using Tradibit.Common.Interfaces;
+using MediatR;
+using Tradibit.Shared.Events;
 using Tradibit.SharedUI.DTO;
-using Tradibit.SharedUI.Primitives;
+using Tradibit.SharedUI.DTO.Primitives;
+using Tradibit.SharedUI.DTO.UserBroker;
 
-namespace Tradibit.Common.Entities;
+namespace Tradibit.Shared.Entities;
 
 public class Strategy : BaseTrackableId
 {
@@ -27,18 +26,25 @@ public class Step
 
 public class Transition
 {
+    private IMediator _mediator;
+
+    public Transition(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
+
     public string Name { get; set; }
     public List<Condition> Conditions { get; set; }
     public List<IOperation> SuccessOperations { get; set; }
     public Guid DestinationStepId { get; set; }
 
-    public async Task<bool> TryTransit(Scenario scenario, QuoteIndicator quoteIndicator)
+    public async Task<bool> TryTransit(ScenarioState scenarioState, QuoteIndicator quoteIndicator)
     {
-        if (!Conditions.All(c => c.Meet(scenario.State, quoteIndicator)))
+        if (!Conditions.All(c => c.Meet(scenarioState, quoteIndicator)))
             return false;
         
-        await Task.WhenAll(SuccessOperations.Select(x => x.Start(scenario)).ToArray());
-        scenario.State.CurrentStepId = DestinationStepId;
+        await Task.WhenAll(SuccessOperations.Select(x => x.Start(scenarioState)).ToArray());
+        scenarioState.CurrentStepId = DestinationStepId;
         return true;
     }
         
@@ -46,17 +52,24 @@ public class Transition
 
 public interface IOperation
 {
-    public Task Start(Scenario state);
+    public Task Start(ScenarioState scenarioState);
 }
 
 public class OrderOperation : IOperation
 {
+    private readonly IMediator _mediator;
     public OrderSide OrderSide { get; set; }
-    public decimal Percent { get; set; }
-    
-    public async Task Start(Scenario scenario)
+
+    public OrderOperation(IMediator mediator)
     {
-        
+        _mediator = mediator;
+    }
+    
+    public async Task Start(ScenarioState scenarioState)
+    {
+        // var amount = OrderSide == OrderSide.BUY 
+        //     ? 
+        //_mediator.Send(new BuyEvent{Pair = scenarioState.Pair, Amount = , UserId = })
     }
 }
 

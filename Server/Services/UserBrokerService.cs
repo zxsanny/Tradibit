@@ -2,12 +2,11 @@
 using Binance.Net.Objects.Models.Spot.Socket;
 using CryptoExchange.Net.Sockets;
 using MediatR;
-using Tradibit.Common.DTO;
-using Tradibit.Common.DTO.Events;
-using Tradibit.Common.DTO.Events.UserBroker;
 using Tradibit.DataAccess;
 using Tradibit.SharedUI.DTO.Coins;
-using Tradibit.SharedUI.Primitives;
+using Tradibit.SharedUI.DTO.Primitives;
+using Tradibit.SharedUI.DTO.UserBroker;
+using Tradibit.SharedUI.DTO.Users;
 using OrderSide = Binance.Net.Enums.OrderSide;
 
 namespace Tradibit.Api.Services;
@@ -72,7 +71,7 @@ public class UserBrokerService :
     
     private void OnTradeUpdate(Guid userId, DataEvent<BinanceStreamTrade> obj)
     {
-        _clientHolder.BinanceTrades.TryAdd((userId, obj));
+        _clientHolder.BinanceTrades.TryAdd((userId, obj));/**/
     }
     
     
@@ -86,6 +85,7 @@ public class UserBrokerService :
     
     public async Task Handle(UserLogoutEvent userLogoutEvent, CancellationToken cancellationToken)
     {
+        await Task.FromResult(0);
         //await UnsubscribeSocketClient(userLogoutEvent.UserId, cancellationToken);
     }
 }

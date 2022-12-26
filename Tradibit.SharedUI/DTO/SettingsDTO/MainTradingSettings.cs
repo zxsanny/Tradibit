@@ -1,4 +1,4 @@
-﻿namespace Tradibit.Common.SettingsDTO;
+﻿namespace Tradibit.SharedUI.DTO.SettingsDTO;
 
 public class MainTradingSettings
 {

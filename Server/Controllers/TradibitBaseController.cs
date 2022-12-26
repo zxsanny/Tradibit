@@ -2,8 +2,8 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Tradibit.Common.DTO;
-using Tradibit.Common.Extensions;
+using Tradibit.SharedUI.DTO;
+using Tradibit.SharedUI.Extensions;
 
 namespace Tradibit.Api.Controllers;
 

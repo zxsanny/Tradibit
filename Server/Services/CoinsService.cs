@@ -1,10 +1,9 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Options;
-using Tradibit.Common;
-using Tradibit.Common.DTO;
-using Tradibit.Common.SettingsDTO;
+using Tradibit.SharedUI;
 using Tradibit.SharedUI.DTO.Coins;
-using Tradibit.SharedUI.Primitives;
+using Tradibit.SharedUI.DTO.Primitives;
+using Tradibit.SharedUI.DTO.SettingsDTO;
 
 namespace Tradibit.Api.Services;
 
