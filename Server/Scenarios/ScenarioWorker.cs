@@ -3,17 +3,15 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Tradibit.DataAccess;
 using Tradibit.Shared.Entities;
+using Tradibit.Shared.Events;
 using Tradibit.SharedUI.DTO;
-using Tradibit.SharedUI.DTO.Primitives;
 using Tradibit.SharedUI.DTO.Scenarios;
-using Tradibit.SharedUI.DTO.UserBroker;
-using Tradibit.SharedUI.DTO.Users;
 using Tradibit.SharedUI.Interfaces;
 
 namespace Tradibit.Api.Scenarios;
 
 public class ScenarioWorker :
-    INotificationHandler<UserLoginEvent>,
+    INotificationHandler<AppInitEvent>,
     IRequestHandler<StartScenarioEvent>,
     IRequestHandler<StartHistoryTestScenarioEvent>,
     IRequestHandler<StopScenarioEvent>,
@@ -26,8 +24,7 @@ public class ScenarioWorker :
 
     private static readonly ConcurrentDictionary<Guid, Scenario> ActiveScenariosDict = new();
     private static readonly ConcurrentDictionary<Guid, Scenario> ReplyHistoryScenariosDict = new();
-    private static bool _init;
-
+    
     public ScenarioWorker(ICandlesProvider candlesProvider, IMediator mediator, TradibitDb db)
     {
         _candlesProvider = candlesProvider;
@@ -76,18 +73,13 @@ public class ScenarioWorker :
         //scenarios.TryAdd(scenario.Id, scenario);
     }
 
-    public async Task Handle(UserLoginEvent notification, CancellationToken cancellationToken)
+    public async Task Handle(AppInitEvent notification, CancellationToken cancellationToken)
     {
-        if (_init)
-            return;
-        var scenarios = await _db.Scenarios.Where(s => s.IsActive).ToListAsync(cancellationToken);
-        
+        var scenarios = await _db.Scenarios.Where(s => s.Strategy.IsActive).ToListAsync(cancellationToken);
         foreach (var scenario in scenarios)
             ActiveScenariosDict.TryAdd(scenario.Id, scenario);
-
-        _init = true;
     }
-
+    
     public async Task<Unit> Handle(KlineUpdateEvent e, CancellationToken cancellationToken)
     {
         foreach (var scenario in ActiveScenariosDict) 

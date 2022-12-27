@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Tradibit.Api.Services;
 using Tradibit.DataAccess;
+using Tradibit.Shared.Events;
 using Tradibit.Shared.Extensions;
 using Tradibit.Shared.MappingProfiles;
 using Tradibit.SharedUI.DTO.SettingsDTO;
@@ -20,7 +21,7 @@ builder.Services.AddRazorPages();
 builder.Services
     .ConfigSection<MainTradingSettings>(builder.Configuration)
     .ConfigSection<AuthConfig>(builder.Configuration)
-
+    .ConfigSection<BinanceWatcherCredentials>(builder.Configuration)
     .AddHttpContextAccessor()
     .AddMediatR(AssemblyExt.GetAllOwnReferencedAssemblies())
     .AddAutoMapper(typeof(BinanceProfile).Assembly)
@@ -89,4 +90,4 @@ app.MapFallbackToFile("index.html");
 
 app.Run();
 
-app.Services.GetService<IMediator>().Publish()
+app.Services.GetService<IMediator>()!.Publish(new AppInitEvent());
