@@ -1,11 +1,9 @@
-using System.Reflection;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Tradibit.Api.Services;
-using Tradibit.Client.Shared;
 using Tradibit.DataAccess;
 using Tradibit.Shared.Extensions;
 using Tradibit.Shared.MappingProfiles;
@@ -90,3 +88,5 @@ app.MapControllers();
 app.MapFallbackToFile("index.html");
 
 app.Run();
+
+app.Services.GetService<IMediator>().Publish()

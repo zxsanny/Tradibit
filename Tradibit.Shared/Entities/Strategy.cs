@@ -11,8 +11,12 @@ public class Strategy : BaseTrackableId
 {
     public string Name { get; set; }
     public string ImageUrl { get; set; }
+    public Guid OwnerId { get; set; }
+    
     public List<Step> Steps { get; set; }
+    
     public bool IsPublic { get; set; }
+    public bool IsActive { get; set; }
 }
 
 public class Step
@@ -26,25 +30,18 @@ public class Step
 
 public class Transition
 {
-    private IMediator _mediator;
-
-    public Transition(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
     public string Name { get; set; }
     public List<Condition> Conditions { get; set; }
     public List<IOperation> SuccessOperations { get; set; }
     public Guid DestinationStepId { get; set; }
 
-    public async Task<bool> TryTransit(ScenarioState scenarioState, QuoteIndicator quoteIndicator)
+    public async Task<bool> TryTransit(Scenario scenario, QuoteIndicator quoteIndicator)
     {
-        if (!Conditions.All(c => c.Meet(scenarioState, quoteIndicator)))
+        if (!Conditions.All(c => c.Meet(scenario, quoteIndicator)))
             return false;
         
-        await Task.WhenAll(SuccessOperations.Select(x => x.Start(scenarioState)).ToArray());
-        scenarioState.CurrentStepId = DestinationStepId;
+        await Task.WhenAll(SuccessOperations.Select(x => x.Start(scenario)).ToArray());
+        scenario.CurrentStepId = DestinationStepId;
         return true;
     }
         
@@ -52,7 +49,7 @@ public class Transition
 
 public interface IOperation
 {
-    public Task Start(ScenarioState scenarioState);
+    public Task Start(Scenario scenario);
 }
 
 public class OrderOperation : IOperation
@@ -65,7 +62,7 @@ public class OrderOperation : IOperation
         _mediator = mediator;
     }
     
-    public async Task Start(ScenarioState scenarioState)
+    public async Task Start(Scenario scenarioState)
     {
         // var amount = OrderSide == OrderSide.BUY 
         //     ? 
@@ -79,10 +76,10 @@ public class Condition
     public Operand Operand2 { get; set; }
     public OperationEnum Operation { get; set; }
 
-    public bool Meet(ScenarioState state, QuoteIndicator quoteIndicator)
+    public bool Meet(Scenario scenario, QuoteIndicator quoteIndicator)
     {
-        var op1 = Operand1.GetValue(state, quoteIndicator);
-        var op2 = Operand2.GetValue(state, quoteIndicator);
+        var op1 = Operand1.GetValue(scenario, quoteIndicator);
+        var op2 = Operand2.GetValue(scenario, quoteIndicator);
         if (!op1.HasValue || !op2.HasValue)
             return false;
         
@@ -112,7 +109,7 @@ public class Operand
     public Operand(IndicatorEnum? indicator) => Indicator = indicator;
     public Operand(string userVarName) => UserVarName = userVarName;
 
-    public decimal? GetValue(ScenarioState state, QuoteIndicator quoteIndicator)
+    public decimal? GetValue(Scenario state, QuoteIndicator quoteIndicator)
     {
         if (NumValue.HasValue)
             return NumValue.Value;
@@ -139,7 +136,7 @@ public class Operand
         return null;
     }
     
-    public void SetValue(ScenarioState state, decimal? value)
+    public void SetValue(Scenario state, decimal? value)
     {
         if (string.IsNullOrEmpty(UserVarName))
             throw new ValidationException("Operand should have User Variable name in order to set it's value");

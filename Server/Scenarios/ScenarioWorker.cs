@@ -98,20 +98,20 @@ public class ScenarioWorker :
 
     private async Task MoveNext(Scenario scenario, QuoteIndicator quoteIndicator, CancellationToken cancellationToken)
     {
-        // bool transited;
-        // do //could be multiple transition on 1 Kline update
-        // {
-        //     transited = false;
-        //     foreach (var transition in scenario.CurrentStep.Transitions)
-        //     {
-        //         transited = await transition.TryTransit(scenario, quoteIndicator);
-        //         if (transited)
-        //         {
-        //             await _db.Save(scenario, cancellationToken);
-        //             break;
-        //         }
-        //     }
-        // } while (transited);
+        bool transited;
+        do //could be multiple transition on 1 Kline update
+        {
+            transited = false;
+            foreach (var transition in scenario.CurrentStep.Transitions)
+            {
+                transited = await transition.TryTransit(scenario, quoteIndicator);
+                if (transited)
+                {
+                    await _db.Save(scenario, cancellationToken);
+                    break;
+                }
+            }
+        } while (transited);
     }
 
 
