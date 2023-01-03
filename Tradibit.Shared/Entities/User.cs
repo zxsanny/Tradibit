@@ -18,5 +18,8 @@ public class User : BaseTrackableId
     public string BinanceSecret => EncryptionService.Decrypt(BinanceSecretHash);
 
     public UserSettings UserSettings { get; set; }
+    
     public UserState UserState { get; set; }
+    
+    public ICollection<UserState> HistoryUserState { get; set; }
 }

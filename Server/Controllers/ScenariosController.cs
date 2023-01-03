@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using Tradibit.Shared.Entities;
 using Tradibit.SharedUI.DTO;
 using Tradibit.SharedUI.DTO.Dashboard;
+using Tradibit.SharedUI.DTO.Primitives;
 using Tradibit.SharedUI.DTO.Scenarios;
 using Tradibit.SharedUI.Interfaces.API;
 
@@ -15,6 +15,9 @@ public class ScenariosController : TradibitBaseController, IScenariosApi
 
     public async Task<Response<UserDashboard>> GetUserDashboard(GetCurrentUserDashboardRequest request) =>
         await Send(request);
+
+    public async Task<Response<List<IdName>>> GetStrategies(GetAvailableStrategiesRequest request) =>
+        await Send(request);
     
     public async Task<Response<List<PagedResponse<ScenarioDto>>>> GetScenarios(GetScenariosRequest request) =>
         await Send(request);
@@ -22,9 +25,11 @@ public class ScenariosController : TradibitBaseController, IScenariosApi
     public async Task<Response> CreateScenario(ScenarioCreatedEvent command) =>
         await Send(command);
     
-    public async Task<Response> TestScenarioHistory(StartHistoryTestScenarioEvent query) =>
-        await Send(query);
+    public async Task<Response> TestScenarioHistory(StartBackTestStrategyEvent e) =>
+        await Send(e);
+}
 
-    public async Task<Response> StartScenario(StartScenarioEvent query) =>
-        await Send(query);
+public class GetAvailableStrategiesRequest : IRequest<List<IdName>>
+{
+    public Guid UserId { get; set; }
 }

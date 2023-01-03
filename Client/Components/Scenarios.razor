@@ -1,0 +1,34 @@
+﻿@using Tradibit.SharedUI.DTO.Dashboard
+@using Tradibit.SharedUI.Interfaces.API
+
+@inject RequestExt RequestExt
+@inject IScenariosApi ScenariosApi
+
+<RadzenPanel AllowCollapse="@false">
+    <HeaderTemplate>Add Scenario</HeaderTemplate>
+    <ChildContent>
+        <RadzenDropDown AllowClear="@true" TValue="string"
+                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+                        AllowFiltering="@true"
+                        Class="w-100" 
+                        Placeholder="Select..."
+                        Data=@strategies
+                        TextProperty="CompanyName" 
+                        ValueProperty="CustomerID"
+                        Change=@(args => OnChange(args, "DropDown with placeholder")) />
+                    
+    </ChildContent>
+</RadzenPanel>
+
+<RadzenButton Click=@AddScenario Text="Add" ButtonStyle="ButtonStyle.Primary" />
+
+@code {
+
+    [Parameter]
+    public List<ScenarioDto> ScenarioDtos { get; set; } = new();
+
+    private async Task AddScenario()
+    {
+        await RequestExt.Send(async () => await ScenariosApi.AddScenario(new GetCurrentUserDashboardRequest()));
+    }
+}

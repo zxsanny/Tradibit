@@ -21,9 +21,7 @@ public class CoinsService : IRequestHandler<GetMostCapCoinsRequest, List<Pair>>
     //TODO: Take coin's volatility into an account
     public async Task<List<Pair>> Handle(GetMostCapCoinsRequest request, CancellationToken cancellationToken)
     {
-        var client = await _clientHolder.GetClient(request.UserId, cancellationToken);  
-        
-        return (await client.SpotApi.ExchangeData.GetProductsAsync(cancellationToken)).Data
+        return (await _clientHolder.MainClient.SpotApi.ExchangeData.GetProductsAsync(cancellationToken)).Data
             .Where(x => x.QuoteAsset == Currency.USDT)
             .Where(x => !Constants.ExcludedCurrencies.Contains(x.BaseAsset))
             .OrderByDescending(x => x.CirculatingSupply * x.ClosePrice)

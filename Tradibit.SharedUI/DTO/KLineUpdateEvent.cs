@@ -5,22 +5,23 @@ namespace Tradibit.SharedUI.DTO;
 
 public class KlineUpdateEvent : IRequest<Unit>
 {
-    public Pair Pair { get; set; }
+    public PairIntervalKey PairIntervalKey { get; set; }
     public QuoteIndicator QuoteIndicator { get; set; }
     
-    public KlineUpdateEvent(Pair pair, QuoteIndicator quoteIndicator)
+    public KlineUpdateEvent(PairIntervalKey pairIntervalKey, QuoteIndicator quoteIndicator)
     {
-        Pair = pair;
+        PairIntervalKey = pairIntervalKey;
         QuoteIndicator = quoteIndicator;
     }
 }
 
 public class KlineHistoryUpdateEvent : KlineUpdateEvent
 {
-    public Guid ScenarioId { get; set; }
+    public Guid StrategyId { get; set; }
 
-    public KlineHistoryUpdateEvent(Guid scenarioId, KlineUpdateEvent klineUpdateEvent) : base(klineUpdateEvent.Pair, klineUpdateEvent.QuoteIndicator)
+    public KlineHistoryUpdateEvent(Guid strategyId, KlineUpdateEvent klineUpdateEvent) 
+        : base(klineUpdateEvent.PairIntervalKey, klineUpdateEvent.QuoteIndicator)
     {
-        ScenarioId = scenarioId;
+        StrategyId = strategyId;
     }
 }

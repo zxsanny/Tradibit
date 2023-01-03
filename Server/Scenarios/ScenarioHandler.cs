@@ -1,14 +1,17 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Tradibit.Api.Controllers;
 using Tradibit.DataAccess;
 using Tradibit.SharedUI.DTO;
 using Tradibit.SharedUI.DTO.Dashboard;
+using Tradibit.SharedUI.DTO.Primitives;
 using Tradibit.SharedUI.Interfaces;
 
 namespace Tradibit.Api.Scenarios;
 
 public class ScenarioHandler : 
-    IRequestHandler<GetCurrentUserDashboardRequest, UserDashboard>
+    IRequestHandler<GetCurrentUserDashboardRequest, UserDashboard>,
+    IRequestHandler<GetAvailableStrategiesRequest, List<IdName>>
 {
     private readonly ICurrentUserProvider _currentUserProvider;
     private readonly TradibitDb _db;
@@ -37,5 +40,11 @@ public class ScenarioHandler :
             UserFunds = funds,
             Scenarios = new List<ScenarioDto>()
         };
+    }
+
+    public async Task<List<IdName>> Handle(GetAvailableStrategiesRequest request, CancellationToken cancellationToken)
+    {
+        await _db.Strategies.Where(s => s.IsPublic || s.Users.Where(us => us.UserId == request.UserId && !us.IsActive))
+            
     }
 }

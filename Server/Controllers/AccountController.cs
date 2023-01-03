@@ -51,7 +51,7 @@ public class AccountController : Controller, IAccountApi
 
         var emailClaim = authRes.Principal.FindFirst(ClaimTypes.Email);
         if (emailClaim == null) return BadRequest();
-        var user = await _mediator.Send(new GetUserRequest(emailClaim.Value));
+        var user = await _mediator.Send(new GetUserByEmailRequest(emailClaim.Value));
         if (user == null)
         {
             await HttpContext.SignOutAsync();

@@ -1,8 +1,6 @@
 ﻿using System.Net.Http.Headers;
-using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.VisualBasic;
 using Refit;
 using Tradibit.SharedUI.Interfaces;
 

@@ -15,6 +15,7 @@ public class TradibitDb : DbContext
     public DbSet<Strategy> Strategies { get; set; }
     public DbSet<UserFund> UserFunds { get; set; }
     public DbSet<ScenarioOperation> ScenarioHistories { get; set; }
+    public DbSet<StrategyUser> StrategyUsers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

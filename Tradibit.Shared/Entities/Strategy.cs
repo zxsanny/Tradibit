@@ -1,9 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using MediatR;
-using Tradibit.Shared.Events;
 using Tradibit.SharedUI.DTO;
 using Tradibit.SharedUI.DTO.Primitives;
-using Tradibit.SharedUI.DTO.UserBroker;
 
 namespace Tradibit.Shared.Entities;
 
@@ -11,20 +9,20 @@ public class Strategy : BaseTrackableId
 {
     public string Name { get; set; }
     public string ImageUrl { get; set; }
-    public Guid OwnerId { get; set; }
     
-    public List<Step> Steps { get; set; }
+    public Guid InitialStepId { get; set; }
     
     public bool IsPublic { get; set; }
     public bool IsActive { get; set; }
+    
+    public ICollection<Step> Steps { get; set; }
+    public ICollection<StrategyUser> Users { get; set; }
 }
 
 public class Step
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
-    public bool IsInitial { get; set; }
-    
     public List<Transition> Transitions { get; set; }
 }
 

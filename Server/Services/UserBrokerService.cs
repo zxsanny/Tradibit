@@ -62,7 +62,7 @@ public class UserBrokerService :
     public async Task Handle(UserLoginEvent loginEvent, CancellationToken cancellationToken)
     {
         var socketClient = await _clientHolder.GetSocketClient(loginEvent.UserId, cancellationToken);
-        var pairs = (await _mediator.Send(new GetMostCapCoinsRequest(loginEvent.UserId), cancellationToken))
+        var pairs = (await _mediator.Send(new GetMostCapCoinsRequest(), cancellationToken))
             .Select(x => x.ToString());
         var res = await socketClient.SpotStreams.SubscribeToTradeUpdatesAsync(pairs,
             tradeEvent => OnTradeUpdate(loginEvent.UserId, tradeEvent), cancellationToken);

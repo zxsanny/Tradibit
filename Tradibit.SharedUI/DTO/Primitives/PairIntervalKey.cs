@@ -2,8 +2,8 @@
 
 public class PairIntervalKey
 {
-    private Pair Pair { get; set; }
-    private Interval Interval { get; set; }
+    public Pair Pair { get; set; }
+    public Interval Interval { get; set; }
 
     public PairIntervalKey(Pair pair, Interval interval)
     {
