@@ -1,10 +1,12 @@
 ﻿@using Tradibit.SharedUI.DTO.Dashboard
 @using Tradibit.SharedUI.DTO.Primitives
 @using Tradibit.SharedUI.DTO.Scenarios
+@using Tradibit.SharedUI.Interfaces
 @using Tradibit.SharedUI.Interfaces.API
 
 @inject RequestExt RequestExt
 @inject IScenariosApi ScenariosApi
+@inject ITokenProvider TokenProvider
 
 <RadzenPanel AllowCollapse="@false">
     <HeaderTemplate>Add Scenario</HeaderTemplate>
@@ -20,15 +22,16 @@
             Data=@_availableStrategies
             TextProperty="Name" 
             ValueProperty="Id"
-            Change="@(async guid => await SelectStrategy((Guid)guid)))" />
+            Change="@(guid => SelectStrategy((Guid)guid))" />
                     
     </ChildContent>
 </RadzenPanel>
 
-<RadzenButton Click=@AddStrategy() Text="Add" ButtonStyle="ButtonStyle.Primary" />
+<RadzenButton Click="@(async () => await AddStrategy())" Text="Add" ButtonStyle="ButtonStyle.Primary" />
 
 @code {
 
+    private Guid? _selectedStrategyId;
     private List<IdName>? _availableStrategies;
 
     [Parameter]
@@ -39,14 +42,17 @@
         _availableStrategies = await RequestExt.Send(async () => await ScenariosApi.GetAvailableStrategies(new GetAvailableStrategiesRequest()));
     }
 
-    private async Task AddStrategy(Guid strategyId)
+    private void SelectStrategy(Guid strategyId)
     {
-        await RequestExt.Send(async () => await ScenariosApi.AddStrategyToUser(new AddStrategyToUserRequest()));
+        _selectedStrategyId = strategyId;
     }
-
-    private async Task SelectStrategy(Guid guid)
+    
+    private async Task AddStrategy(CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        if (!_selectedStrategyId.HasValue)
+            return;
+        
+        var addStrategyToUser = new AddStrategyToUserRequest(await TokenProvider.GetCurrentUserId(cancellationToken), _selectedStrategyId.Value);
+        await RequestExt.Send(async () => await ScenariosApi.AddStrategyToUser(addStrategyToUser));
     }
-
 }

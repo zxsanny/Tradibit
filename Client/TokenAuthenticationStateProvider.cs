@@ -37,9 +37,9 @@ namespace Tradibit.Client
             }
         }
 
-        public async Task<string?> GetToken()
+        public async Task<string?> GetToken(CancellationToken cancellationToken = default)
         {
-            var token = await _localStorage.GetItemAsync<string>(Constants.AUTH_TOKEN_KEY) ?? await GetTokenFromApi();
+            var token = await _localStorage.GetItemAsync<string>(Constants.AUTH_TOKEN_KEY, cancellationToken) ?? await GetTokenFromApi();
             var claims = ParseClaimsFromJwt(token).ToList();
             var expiryTime = Convert.ToDouble(claims.FirstOrDefault(x => x.Type == "exp")?.Value ?? "").FromUnixTimeStamp();
             if (expiryTime < DateTime.Now) 
@@ -47,9 +47,9 @@ namespace Tradibit.Client
 
             return token;
         }
-
-        public async Task<IEnumerable<Claim>> GetClaims() => 
-            ParseClaimsFromJwt(await GetToken());
+        
+        public async Task<IEnumerable<Claim>> GetClaims(CancellationToken cancellationToken = default) => 
+            ParseClaimsFromJwt(await GetToken(cancellationToken));
 
         private async Task<string?> GetTokenFromApi()
         {
@@ -59,9 +59,18 @@ namespace Tradibit.Client
             
             return token; 
         }
-        public async Task<bool> IsSuperAdmin()
+
+        public async Task<Guid> GetCurrentUserId(CancellationToken cancellationToken = default)
         {
-            var claims = await GetClaims();
+            var claims = await GetClaims(cancellationToken);
+            if (!Guid.TryParse(claims.FirstOrDefault(x => x.Type == "Id")?.Value, out var userId))
+                userId = Guid.Empty;
+            return userId;
+        }
+
+        public async Task<bool> IsSuperAdmin(CancellationToken cancellationToken = default)
+        {
+            var claims = await GetClaims(cancellationToken);
             return claims.Any(x => x.Type == "UserRoleId" && x.Value == "1");
         }
 
