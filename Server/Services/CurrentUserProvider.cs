@@ -15,6 +15,16 @@ public class CurrentUserProvider : ICurrentUserProvider
         _httpAccessor = httpAccessor;
     }
 
+    public Guid CurrentUserId
+    {
+        get
+        {
+            if (!Guid.TryParse(_httpAccessor.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == nameof(UserDto.Id))?.Value, out var userId))
+                userId = Guid.Empty;
+            return userId;
+        }
+    }
+    
     public UserDto CurrentUser
     {
         get
@@ -23,11 +33,7 @@ public class CurrentUserProvider : ICurrentUserProvider
             if (principal == null)
                 throw new AuthenticationException("Auth Claims are empty!");
         
-            var claims = principal.Identities.SelectMany(x => x.Claims).ToList();
-            if (!claims.Any())
-                return null;
-
-            var claimsDict = claims.ToDictionary(x => x.Type, x => x.Value);
+            var claimsDict = principal.Claims.ToDictionary(x => x.Type, x => x.Value);
 
             return new UserDto
             {

@@ -1,4 +1,6 @@
 ﻿@using Tradibit.SharedUI.DTO.Dashboard
+@using Tradibit.SharedUI.DTO.Primitives
+@using Tradibit.SharedUI.DTO.Scenarios
 @using Tradibit.SharedUI.Interfaces.API
 
 @inject RequestExt RequestExt
@@ -7,28 +9,44 @@
 <RadzenPanel AllowCollapse="@false">
     <HeaderTemplate>Add Scenario</HeaderTemplate>
     <ChildContent>
-        <RadzenDropDown AllowClear="@true" TValue="string"
-                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
-                        AllowFiltering="@true"
-                        Class="w-100" 
-                        Placeholder="Select..."
-                        Data=@strategies
-                        TextProperty="CompanyName" 
-                        ValueProperty="CustomerID"
-                        Change=@(args => OnChange(args, "DropDown with placeholder")) />
+        <RadzenDropDown 
+            
+            AllowClear="true"
+            TValue="Guid"
+            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+            AllowFiltering="@true"
+            Class="w-100" 
+            Placeholder="Select..."
+            Data=@_availableStrategies
+            TextProperty="Name" 
+            ValueProperty="Id"
+            Change="@(async guid => await SelectStrategy((Guid)guid)))" />
                     
     </ChildContent>
 </RadzenPanel>
 
-<RadzenButton Click=@AddScenario Text="Add" ButtonStyle="ButtonStyle.Primary" />
+<RadzenButton Click=@AddStrategy() Text="Add" ButtonStyle="ButtonStyle.Primary" />
 
 @code {
+
+    private List<IdName>? _availableStrategies;
 
     [Parameter]
     public List<ScenarioDto> ScenarioDtos { get; set; } = new();
 
-    private async Task AddScenario()
+    protected override async Task OnInitializedAsync()
     {
-        await RequestExt.Send(async () => await ScenariosApi.AddScenario(new GetCurrentUserDashboardRequest()));
+        _availableStrategies = await RequestExt.Send(async () => await ScenariosApi.GetAvailableStrategies(new GetAvailableStrategiesRequest()));
     }
+
+    private async Task AddStrategy(Guid strategyId)
+    {
+        await RequestExt.Send(async () => await ScenariosApi.AddStrategyToUser(new AddStrategyToUserRequest()));
+    }
+
+    private async Task SelectStrategy(Guid guid)
+    {
+        throw new NotImplementedException();
+    }
+
 }

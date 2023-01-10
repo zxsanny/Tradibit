@@ -16,20 +16,18 @@ public class ScenariosController : TradibitBaseController, IScenariosApi
     public async Task<Response<UserDashboard>> GetUserDashboard(GetCurrentUserDashboardRequest request) =>
         await Send(request);
 
-    public async Task<Response<List<IdName>>> GetStrategies(GetAvailableStrategiesRequest request) =>
+    public async Task<Response<List<IdName>>> GetAvailableStrategies(GetAvailableStrategiesRequest request) =>
+        await Send(request);
+    
+    public async Task<Response> AddStrategyToUser(AddStrategyToUserRequest request) =>
+        await Send(request);
+
+    public async Task<Response> RemoveStrategyFromUser(RemoveStrategyFromUserRequest request) =>
         await Send(request);
     
     public async Task<Response<List<PagedResponse<ScenarioDto>>>> GetScenarios(GetScenariosRequest request) =>
         await Send(request);
-
-    public async Task<Response> CreateScenario(ScenarioCreatedEvent command) =>
-        await Send(command);
     
     public async Task<Response> TestScenarioHistory(StartBackTestStrategyEvent e) =>
         await Send(e);
-}
-
-public class GetAvailableStrategiesRequest : IRequest<List<IdName>>
-{
-    public Guid UserId { get; set; }
 }
