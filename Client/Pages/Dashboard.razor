@@ -4,7 +4,7 @@
 @using Tradibit.SharedUI.Interfaces.API
 
 @inject RequestExt RequestExt
-@inject IScenariosApi ScenariosApi
+@inject IStrategiesApi StrategiesApi
 
 <PageTitle>Dashboard</PageTitle>
 
@@ -20,7 +20,7 @@
     
     protected override async Task OnInitializedAsync()
     {
-        _userDashboard = await RequestExt.Send(async () => await ScenariosApi.GetUserDashboard(new GetCurrentUserDashboardRequest()));
+        _userDashboard = await RequestExt.Send(async () => await StrategiesApi.GetUserDashboard(new GetCurrentUserDashboardRequest()));
         
         await base.OnInitializedAsync();
     }

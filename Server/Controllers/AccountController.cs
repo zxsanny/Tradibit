@@ -71,6 +71,8 @@ public class AccountController : Controller, IAccountApi
         return Redirect(returnUrl ?? "/");
     }
 
+    [HttpGet("getCurrentUserToken")]
+    [AllowAnonymous]
     public async Task<Response<string>> GetCurrentUserToken()
     {
         if (User.Identity is not {IsAuthenticated: true}) 

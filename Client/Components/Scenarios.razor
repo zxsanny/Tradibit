@@ -5,7 +5,7 @@
 @using Tradibit.SharedUI.Interfaces.API
 
 @inject RequestExt RequestExt
-@inject IScenariosApi ScenariosApi
+@inject IStrategiesApi StrategiesApi
 @inject ITokenProvider TokenProvider
 
 <RadzenPanel AllowCollapse="@false">
@@ -39,7 +39,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _availableStrategies = await RequestExt.Send(async () => await ScenariosApi.GetAvailableStrategies(new GetAvailableStrategiesRequest()));
+        _availableStrategies = await RequestExt.Send(async () => await StrategiesApi.GetAvailableStrategies(new GetAvailableStrategiesRequest()));
     }
 
     private void SelectStrategy(Guid strategyId)
@@ -53,6 +53,6 @@
             return;
         
         var addStrategyToUser = new AddStrategyToUserRequest(await TokenProvider.GetCurrentUserId(cancellationToken), _selectedStrategyId.Value);
-        await RequestExt.Send(async () => await ScenariosApi.AddStrategyToUser(addStrategyToUser));
+        await RequestExt.Send(async () => await StrategiesApi.AddStrategyToUser(addStrategyToUser));
     }
 }

@@ -8,14 +8,13 @@ namespace Tradibit.SharedUI.Extensions;
 
 public static class RefitExtensions
 {
-    public static IServiceCollection AddRefit<T>(this IServiceCollection services, string apiUrl, bool isBearer = false, bool isHmac = false) where T : class
+    public static IServiceCollection AddRefit<T>(this IServiceCollection services, string apiUrl, bool requireAuthToken = true) where T : class
     {
-        if (isBearer) 
-            services.TryAddTransient<UserBearerAuthenticationHandler>();
+        services.TryAddTransient<UserBearerAuthenticationHandler>();
 
         services.AddRefitClient<T>()
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiUrl))
-            .AddHttpMessageHandler<UserBearerAuthenticationHandler>();
+            .If(requireAuthToken, b => b.AddHttpMessageHandler<UserBearerAuthenticationHandler>());
         return services;
     }
 }
@@ -34,7 +33,7 @@ public class UserBearerAuthenticationHandler : DelegatingHandler
     /// <summary> </summary>
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", await _tokenProvider.GetToken());
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", await _tokenProvider.GetToken(cancellationToken));
         return await base.SendAsync(request, cancellationToken);
     }
 }
