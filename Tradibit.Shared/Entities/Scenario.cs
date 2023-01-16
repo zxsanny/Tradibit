@@ -12,8 +12,8 @@ public class Scenario : BaseTrackableId
 
     public Strategy Strategy { get; set; }
     
+    
     private Dictionary<Guid, Step> _stepsDict;
     public Dictionary<Guid, Step> StepsDict => _stepsDict ??= Strategy.Steps.ToDictionary(x => x.Id);
-    
     public Step CurrentStep => StepsDict[CurrentStepId];
 }
