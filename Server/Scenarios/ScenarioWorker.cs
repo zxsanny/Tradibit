@@ -135,7 +135,10 @@ public class ScenarioWorker :
                 if (!transition.Conditions.All(c => c.Meet(scenario, quoteIndicator)))
                     continue;
 
-                await Task.WhenAll( transition.SuccessOperations); 
+                await Task.WhenAll(transition.SuccessOperations
+                    .OrderBy(x => x.OrderNo)
+                    .Select(x => _mediator.Send(new OperationEvent(x), cancellationToken))); 
+                
                 scenario.CurrentStepId = transition.DestinationStepId;
                 await _db.Save(scenario, cancellationToken);
                 break;
