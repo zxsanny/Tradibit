@@ -132,16 +132,17 @@ public class ScenarioWorker :
             transited = false;
             foreach (var transition in scenario.CurrentStep.Transitions)
             {
-                transited = await transition.TryTransit(scenario, quoteIndicator);
-                if (transited)
-                {
-                    await _db.Save(scenario, cancellationToken);
-                    break;
-                }
+                if (!transition.Conditions.All(c => c.Meet(scenario, quoteIndicator)))
+                    continue;
+
+                await Task.WhenAll( transition.SuccessOperations); 
+                scenario.CurrentStepId = transition.DestinationStepId;
+                await _db.Save(scenario, cancellationToken);
+                break;
             }
         } while (transited);
     }
-    
+
     public async Task<Unit> Handle(KlineHistoryUpdateEvent e, CancellationToken cancellationToken)
     {
         if (!ReplyHistoryScenariosDict.TryGetValue((e.PairIntervalKey, e.StrategyId), out var scenario))

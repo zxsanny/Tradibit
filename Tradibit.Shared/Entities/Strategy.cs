@@ -19,61 +19,40 @@ public class Strategy : BaseTrackableId
     public ICollection<StrategyUser> Users { get; set; }
 }
 
-public class Step
+public class Step : BaseTrackableId
 {
-    public Guid Id { get; set; }
     public string Name { get; set; }
-    public List<Transition> Transitions { get; set; }
+    public ICollection<Transition> Transitions { get; set; }
+
+    public Strategy Strategy { get; set; }
+    public Guid StrategyId { get; set; }
 }
 
-public class Transition
+public class Transition : BaseTrackableId
 {
     public string Name { get; set; }
-    public List<Condition> Conditions { get; set; }
-    public List<IOperation> SuccessOperations { get; set; }
     public Guid DestinationStepId { get; set; }
-
-    public async Task<bool> TryTransit(Scenario scenario, QuoteIndicator quoteIndicator)
-    {
-        if (!Conditions.All(c => c.Meet(scenario, quoteIndicator)))
-            return false;
-        
-        await Task.WhenAll(SuccessOperations.Select(x => x.Start(scenario)).ToArray());
-        scenario.CurrentStepId = DestinationStepId;
-        return true;
-    }
-        
-}
-
-public interface IOperation
-{
-    public Task Start(Scenario scenario);
-}
-
-public class OrderOperation : IOperation
-{
-    private readonly IMediator _mediator;
-    public OrderSide OrderSide { get; set; }
-
-    public OrderOperation(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
     
-    public async Task Start(Scenario scenarioState)
-    {
-        // var amount = OrderSide == OrderSide.BUY 
-        //     ? 
-        //_mediator.Send(new BuyEvent{Pair = scenarioState.Pair, Amount = , UserId = })
-    }
+    public Guid StepId { get; set; }
+    public Step Step { get; set; }
+    
+    public ICollection<Condition> Conditions { get; set; }
+    public ICollection<OperationBase> SuccessOperations { get; set; }
 }
 
-public class Condition
+public class Condition : BaseTrackableId
 {
+    public Guid Operand1Id { get; set; }
     public Operand Operand1 { get; set; }
+    
+    public Guid Operand2Id { get; set; }
     public Operand Operand2 { get; set; }
+    
     public OperationEnum Operation { get; set; }
 
+    public Guid TransitionId { get; set; }
+    public Transition Transition { get; set; }
+    
     public bool Meet(Scenario scenario, QuoteIndicator quoteIndicator)
     {
         var op1 = Operand1.GetValue(scenario, quoteIndicator);
@@ -103,10 +82,6 @@ public class Operand
     public IndicatorEnum? Indicator { get; set; }
     public string UserVarName { get; set; }
     
-    public Operand(decimal? numValue) => NumValue = numValue;
-    public Operand(IndicatorEnum? indicator) => Indicator = indicator;
-    public Operand(string userVarName) => UserVarName = userVarName;
-
     public decimal? GetValue(Scenario state, QuoteIndicator quoteIndicator)
     {
         if (NumValue.HasValue)
