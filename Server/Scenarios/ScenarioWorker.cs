@@ -61,7 +61,7 @@ public class ScenarioWorker :
     public async Task<Unit> Handle(StartBackTestStrategyEvent request, CancellationToken cancellationToken)
     {
         var user = await _mediator.Send(new GetUserByIdRequest(request.UserId), cancellationToken);
-        user.HistoryUserState.Add(new UserState(request.Deposit, request.StrategyId));
+        user.HistoryUserState.Add(new UserState { CurrentDeposit = request.Deposit });
         
         await AddStrategyScenarios(request.StrategyId, isHistory: true, request.Pairs, request.Intervals, cancellationToken);
         
@@ -111,7 +111,14 @@ public class ScenarioWorker :
 
     public async Task Handle(AppInitEvent notification, CancellationToken cancellationToken)
     {
-        var scenarios = await _db.Scenarios.Where(s => s.Strategy.IsActive).ToListAsync(cancellationToken);
+        var scenarios = await _db.Scenarios.Where(s => s.Strategy.IsActive)
+            .Include(x => x.Strategy.Steps)
+                .ThenInclude(x => x.Transitions)
+                .ThenInclude(x => x.Conditions)
+            .Include(x => x.Strategy.Steps)
+                .ThenInclude(x => x.Transitions)
+                .ThenInclude(x => x.SuccessOperations)
+            .ToListAsync(cancellationToken);
         foreach (var scenario in scenarios)
             ActiveScenariosDict.TryAdd((scenario.PairIntervalKey, scenario.StrategyId), scenario);
     }
@@ -119,28 +126,42 @@ public class ScenarioWorker :
     public async Task<Unit> Handle(KlineUpdateEvent e, CancellationToken cancellationToken)
     {
         foreach (var scenario in ActiveScenariosDict)
-            await MoveNext(scenario.Value, e.QuoteIndicator, cancellationToken);
+            await ApplyKlineToScenario(scenario.Value, e, cancellationToken);
 
         return Unit.Value;
     }
 
-    private async Task MoveNext(Scenario scenario, QuoteIndicator quoteIndicator, CancellationToken cancellationToken)
+    private async Task ApplyKlineToScenario(Scenario scenario, KlineUpdateEvent e, CancellationToken cancellationToken)
     {
         bool transited;
+        var currentStep = scenario.CurrentStep;
+        
         do //could be multiple transition on 1 Kline update
         {
             transited = false;
-            foreach (var transition in scenario.CurrentStep.Transitions)
+            foreach (var transition in currentStep.Transitions)
             {
-                if (!transition.Conditions.All(c => c.Meet(scenario, quoteIndicator)))
+                if (!transition.Conditions.All(c => c.Meet(scenario, e.QuoteIndicator)))
                     continue;
 
                 await Task.WhenAll(transition.SuccessOperations
                     .OrderBy(x => x.OrderNo)
-                    .Select(x => _mediator.Send(new OperationEvent(x), cancellationToken))); 
+                    .Select(op =>
+                    {
+                        op.Scenario = scenario;
+                        op.KlineUpdateEvent = e;
+                        return _mediator.Send(op, cancellationToken);
+                    })); 
                 
                 scenario.CurrentStepId = transition.DestinationStepId;
+                currentStep = await _db.Steps
+                    .Include(x => x.Transitions)
+                        .ThenInclude(x => x.Conditions)
+                    .Include(x => x.Transitions)
+                        .ThenInclude(x => x.SuccessOperations)
+                    .SingleAsync(x => x.Id == transition.DestinationStepId, cancellationToken);
                 await _db.Save(scenario, cancellationToken);
+                transited = true;
                 break;
             }
         } while (transited);
@@ -151,7 +172,7 @@ public class ScenarioWorker :
         if (!ReplyHistoryScenariosDict.TryGetValue((e.PairIntervalKey, e.StrategyId), out var scenario))
             return Unit.Value;
         
-        await MoveNext(scenario, e.QuoteIndicator, cancellationToken);
+        await ApplyKlineToScenario(scenario, e, cancellationToken);
         return Unit.Value;
     }
 }

@@ -30,10 +30,14 @@ public class ClientHolder : IClientHolder
     {
         _scopeFactory = scopeFactory;
         
-        var binanceCreds = binanceWatcherCredentials.Value;
+        var binanceCredentials = binanceWatcherCredentials.Value;
+        if (string.IsNullOrEmpty(binanceCredentials.BinanceKeyHash) || string.IsNullOrEmpty(binanceCredentials.BinanceSecretHash))
+            throw new Exception($"{nameof(binanceCredentials.BinanceKeyHash)} and {nameof(binanceCredentials.BinanceSecretHash)} should be filled " +
+                                "with appropriate acc information for the API access to binance.");
+
         var apiCredentials = new ApiCredentials(
-            EncryptionService.Decrypt(binanceCreds.BinanceKeyHash),
-            EncryptionService.Decrypt(binanceCreds.BinanceSecretHash));
+            EncryptionService.Decrypt(binanceCredentials.BinanceKeyHash),
+            EncryptionService.Decrypt(binanceCredentials.BinanceSecretHash));
 
         MainClient = new BinanceClient(new BinanceClientOptions { ApiCredentials = apiCredentials });
         MainSocketClient = new BinanceSocketClient(new BinanceSocketClientOptions { ApiCredentials = apiCredentials });

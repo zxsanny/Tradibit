@@ -82,7 +82,7 @@ public class Operand
     public IndicatorEnum? Indicator { get; set; }
     public string UserVarName { get; set; }
     
-    public decimal? GetValue(Scenario state, QuoteIndicator quoteIndicator)
+    public decimal? GetValue(Scenario scenario, QuoteIndicator quoteIndicator)
     {
         if (NumValue.HasValue)
             return NumValue.Value;
@@ -104,17 +104,17 @@ public class Operand
             return quoteIndicator.Indicators[Indicator.Value];
     
         if (!string.IsNullOrWhiteSpace(UserVarName))
-            return state.UserVars[UserVarName];
+            return scenario.UserVars[UserVarName];
     
         return null;
     }
     
-    public void SetValue(Scenario state, decimal? value)
+    public void SetValue(Scenario scenario, decimal? value)
     {
         if (string.IsNullOrEmpty(UserVarName))
             throw new ValidationException("Operand should have User Variable name in order to set it's value");
 
-        state.UserVars[UserVarName] = value;
+        scenario.UserVars[UserVarName] = value;
     }
 }
 

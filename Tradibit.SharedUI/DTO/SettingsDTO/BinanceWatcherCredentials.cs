@@ -2,6 +2,6 @@
 
 public class BinanceWatcherCredentials
 {
-    public string BinanceKeyHash { get; set; }
-    public string BinanceSecretHash { get; set; }
+    public string? BinanceKeyHash { get; set; }
+    public string? BinanceSecretHash { get; set; }
 }

@@ -5,13 +5,19 @@ namespace Tradibit.Shared.Entities;
 
 public class UserState : BaseTrackableId
 {
-    public List<(Pair, decimal)> ActivePairs { get; set; }
+    //to json
+    public List<ActivePair> ActivePairs { get; set; }
     public decimal CurrentDeposit { get; set; }
-    public Guid? StrategyId { get; set; }
+}
 
-    public UserState(decimal deposit, Guid? strategyId = null)
+public class ActivePair
+{
+    public Pair Pair { get; set; }
+    public decimal Amount { get; set; }
+
+    public ActivePair(Pair pair, decimal amount)
     {
-        CurrentDeposit = deposit;
-        StrategyId = strategyId;
+        Pair = pair;
+        Amount = amount;
     }
 }

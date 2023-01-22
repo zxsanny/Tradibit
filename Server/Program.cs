@@ -22,6 +22,7 @@ builder.Services
     .ConfigSection<MainTradingSettings>(builder.Configuration)
     .ConfigSection<AuthConfig>(builder.Configuration)
     .ConfigSection<BinanceWatcherCredentials>(builder.Configuration)
+    .ConfigSection<DatabaseOptions>(builder.Configuration)
     .AddHttpContextAccessor()
     .AddMediatR(AssemblyExt.GetAllOwnReferencedAssemblies())
     .AddAutoMapper(typeof(BinanceProfile).Assembly)

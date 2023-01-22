@@ -1,14 +1,19 @@
+using MediatR;
 using Tradibit.SharedUI.DTO;
 using Tradibit.SharedUI.DTO.Primitives;
 
 namespace Tradibit.Shared.Entities;
 
-public abstract class OperationBase : BaseTrackableId
+public abstract class OperationBase : BaseTrackableId, IRequest
 {
     public int OrderNo { get; set; }
-    
+
     public Guid TransitionId { get; set; }
     public Transition Transition { get; set; }
+    
+    // non trackable
+    public Scenario Scenario { get; set; }
+    public KlineUpdateEvent KlineUpdateEvent { get; set; }
 }
 
 public class OrderOperation : OperationBase
