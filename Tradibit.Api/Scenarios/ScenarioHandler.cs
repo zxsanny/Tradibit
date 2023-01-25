@@ -30,8 +30,12 @@ public class ScenarioHandler :
     {
         var funds = await _db.UserFunds
             .Where(x => x.UserId == _currentUserProvider.CurrentUser.Id)
-            .OrderBy(x => x.TimeValue.DateTime)
-            .Select(x => x.TimeValue)
+            .OrderBy(x => x.DateTime)
+            .Select(x => new TimeValue
+            {
+                Value = x.Value, 
+                DateTime = x.DateTime
+            })
             .ToListAsync(cancellationToken);
 
         var first = funds.FirstOrDefault();

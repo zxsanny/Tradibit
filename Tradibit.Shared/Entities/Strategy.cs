@@ -38,15 +38,12 @@ public class Transition : BaseTrackableId
     public Step Step { get; set; }
     
     public ICollection<Condition> Conditions { get; set; }
-    public ICollection<OperationBase> SuccessOperations { get; set; }
+    public ICollection<BaseOperation> SuccessOperations { get; set; }
 }
 
 public class Condition : BaseTrackableId
 {
-    public Guid Operand1Id { get; set; }
     public Operand Operand1 { get; set; }
-    
-    public Guid Operand2Id { get; set; }
     public Operand Operand2 { get; set; }
     
     public OperationEnum Operation { get; set; }

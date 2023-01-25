@@ -5,5 +5,6 @@ namespace Tradibit.Shared.Entities;
 public class UserFund : BaseTrackableId 
 {
     public Guid UserId { get; set; }
-    public TimeValue TimeValue { get; set; }
+    public DateTime DateTime { get; set; }
+    public decimal Value { get; set; }
 }

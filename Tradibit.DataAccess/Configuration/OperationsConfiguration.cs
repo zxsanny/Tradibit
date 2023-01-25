@@ -4,9 +4,9 @@ using Tradibit.Shared.Entities;
 
 namespace Tradibit.DataAccess.Configuration;
 
-public class OperationsConfiguration : IEntityTypeConfiguration<OperationBase>
+public class OperationsConfiguration : IEntityTypeConfiguration<BaseOperation>
 {
-    public void Configure(EntityTypeBuilder<OperationBase> builder)
+    public void Configure(EntityTypeBuilder<BaseOperation> builder)
     {
         builder.HasKey(x => x.Id);
 
@@ -18,7 +18,16 @@ public class OperationsConfiguration : IEntityTypeConfiguration<OperationBase>
         builder.Ignore(x => x.KlineUpdateEvent);
 
         builder.HasDiscriminator<int>("OperationType")
-            .HasValue<OrderOperation>(1)
-            .HasValue<SetOperandOperation>(2);
+            .HasValue<OrderBaseOperation>(1)
+            .HasValue<SetOperandBaseOperation>(2);
+    }
+}
+
+public class SetOperandOperationConfiguration : IEntityTypeConfiguration<SetOperandBaseOperation>
+{
+    public void Configure(EntityTypeBuilder<SetOperandBaseOperation> builder)
+    {
+        builder.OwnsOne(x => x.OperandSource);
+        builder.OwnsOne(x => x.OperandTo);
     }
 }

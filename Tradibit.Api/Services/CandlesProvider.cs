@@ -94,16 +94,15 @@ public class CandlesProvider : ICandlesProvider,
     public async Task<Unit> Handle(ReplyHistoryEvent e, CancellationToken cancellationToken)
     {
         var pairs = e.Pairs ?? await _mediator.Send(new GetMostCapCoinsRequest(), cancellationToken);
-        var intervals = e.Intervals ?? Constants.DefaultIntervals;
         
-        await InitQuotes(pairs, intervals, isHistory: true, e.HistorySpan, cancellationToken);
+        await InitQuotes(pairs, Constants.DefaultIntervals, isHistory: true, e.HistorySpan, cancellationToken);
         
         var totalCount = _historyQuotes[new PairIntervalKey(pairs.First(), Constants.DefaultIntervals.First())].Count;
 
         for (int c = 0; c < totalCount; c++)
             foreach (var pair in pairs)
             {
-                foreach (var interval in intervals)
+                foreach (var interval in Constants.DefaultIntervals)
                 {
                     var pairIntervalKey = new PairIntervalKey(pair, interval);
                     var indicators = _historyIndicators[pairIntervalKey].ToDictionary(x => x.Key, x => x.Value[c]);

@@ -4,7 +4,7 @@ using Tradibit.SharedUI.DTO.Primitives;
 
 namespace Tradibit.Shared.Entities;
 
-public abstract class OperationBase : BaseTrackableId, IRequest
+public abstract class BaseOperation : BaseTrackableId, IRequest
 {
     public int OrderNo { get; set; }
 
@@ -16,16 +16,13 @@ public abstract class OperationBase : BaseTrackableId, IRequest
     public KlineUpdateEvent KlineUpdateEvent { get; set; }
 }
 
-public class OrderOperation : OperationBase
+public class OrderBaseOperation : BaseOperation
 {
     public OrderSide OrderSide { get; set; }
 }
 
-public class SetOperandOperation : OperationBase
+public class SetOperandBaseOperation : BaseOperation
 {
-    public Guid OperandSourceId { get; set; }
     public Operand OperandSource { get; set; }
-
-    public Guid OperandToId { get; set; }
     public Operand OperandTo { get; set; }
 }

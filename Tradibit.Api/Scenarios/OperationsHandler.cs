@@ -8,8 +8,8 @@ using Tradibit.SharedUI.DTO.UserBroker;
 namespace Tradibit.Api.Scenarios;
 
 public class OperationsHandler :
-    IRequestHandler<OrderOperation>,
-    IRequestHandler<SetOperandOperation>
+    IRequestHandler<OrderBaseOperation>,
+    IRequestHandler<SetOperandBaseOperation>
 {
     private readonly IMediator _mediator;
     private readonly TradibitDb _db;
@@ -20,7 +20,7 @@ public class OperationsHandler :
         _db = db;
     }
     
-    public async Task<Unit> Handle(OrderOperation request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(OrderBaseOperation request, CancellationToken cancellationToken)
     {
         var users = await _db.StrategyUsers
             .Where(x => x.StrategyId == request.Scenario.StrategyId)
@@ -60,7 +60,7 @@ public class OperationsHandler :
         return Unit.Value;
     }
 
-    public async Task<Unit> Handle(SetOperandOperation request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(SetOperandBaseOperation request, CancellationToken cancellationToken)
     {
         var val = request.OperandSource.GetValue(request.Scenario, request.KlineUpdateEvent.QuoteIndicator);
         request.OperandTo.SetValue(request.Scenario, val);

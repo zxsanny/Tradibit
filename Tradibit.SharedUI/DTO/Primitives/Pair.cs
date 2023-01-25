@@ -6,6 +6,9 @@ public class Pair  : IEquatable<Pair>
 
     public readonly Currency BaseCurrency;
     public readonly Currency QuoteCurrency;
+
+    //for ef-core
+    public Pair(){}
     
     public Pair(string baseCurrency, string quoteCurrency) : 
         this(new Currency(baseCurrency), new Currency(quoteCurrency)) { }
@@ -64,6 +67,10 @@ public class Pair  : IEquatable<Pair>
 public class Currency : IEquatable<Currency>
 {
     public string Value { get; }
+    
+    //for ef-core
+    public Currency(){}
+    
     public Currency(string value)
     {
         if (string.IsNullOrEmpty(value)) throw new Exception("Currency name should not be empty!");
@@ -72,9 +79,9 @@ public class Currency : IEquatable<Currency>
         Value = value;
     }
 
-    public override string ToString() => Value;
+    public override string? ToString() => Value;
 
-    public static bool operator ==(Currency currency1, Currency? currency2)
+    public static bool operator ==(Currency? currency1, Currency? currency2)
     {
         if (currency1 is null)
             return currency2 is null;
@@ -86,18 +93,18 @@ public class Currency : IEquatable<Currency>
         !(currency1 == currency2);
 
     public bool Equals(Currency? other) =>
-        Value.Equals(other?.Value);
+        Value != null && Value.Equals(other?.Value);
 
     public override bool Equals(object? obj) =>
         Equals((Currency?)obj);
 
     public override int GetHashCode() =>
-        Value.GetHashCode();
+        Value?.GetHashCode() ?? 0;
 
-    public static implicit operator string(Currency currency) => 
+    public static implicit operator string?(Currency currency) => 
         currency.Value;
 
-    public static Currency USDT = new("USDT");
-    public static Currency BTC = new("BTC");
+    public static readonly Currency USDT = new("USDT");
+    public static readonly Currency BTC = new("BTC");
     public static Currency ETH = new("ETH");
 }
