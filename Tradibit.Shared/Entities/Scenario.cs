@@ -6,7 +6,7 @@ namespace Tradibit.Shared.Entities;
 public class Scenario : BaseTrackableId
 {
     public Guid StrategyId { get; set; }
-    public PairIntervalKey PairIntervalKey { get; set; }
+    public Pair Pair { get; set; }
     public Dictionary<string, decimal?> UserVars { get; set; }
     public Guid CurrentStepId { get; set; }
 

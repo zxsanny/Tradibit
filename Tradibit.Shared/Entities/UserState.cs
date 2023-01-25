@@ -15,6 +15,9 @@ public class ActivePair
     public Pair Pair { get; set; }
     public decimal Amount { get; set; }
 
+    //for ef-core
+    public ActivePair(){}
+    
     public ActivePair(Pair pair, decimal amount)
     {
         Pair = pair;

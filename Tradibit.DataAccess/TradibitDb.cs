@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Tradibit.DataAccess.Configuration;
+﻿using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Tradibit.Shared.Entities;
 
 namespace Tradibit.DataAccess;
@@ -20,6 +20,6 @@ public class TradibitDb : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfiguration(new UserConfiguration());
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

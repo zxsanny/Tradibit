@@ -2,21 +2,21 @@
 
 public class Pair  : IEquatable<Pair>
 {
-    public static string SEPARATOR = "";
+    private static string SEPARATOR = "";
 
-    private readonly Currency _baseCurrency;
-    private readonly Currency _quoteCurrency;
-        
+    public readonly Currency BaseCurrency;
+    public readonly Currency QuoteCurrency;
+    
     public Pair(string baseCurrency, string quoteCurrency) : 
         this(new Currency(baseCurrency), new Currency(quoteCurrency)) { }
 
     public Pair(Currency baseCurrency, Currency quoteCurrency)
     {
-        _baseCurrency = baseCurrency;
-        _quoteCurrency = quoteCurrency;
+        BaseCurrency = baseCurrency;
+        QuoteCurrency = quoteCurrency;
     }
 
-    public override string ToString() => $"{_baseCurrency}{SEPARATOR}{_quoteCurrency}";
+    public override string ToString() => $"{BaseCurrency}{SEPARATOR}{QuoteCurrency}";
 
     public static Pair ParseOrDefault(string input) 
     {
@@ -45,7 +45,7 @@ public class Pair  : IEquatable<Pair>
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return Equals(_baseCurrency, other._baseCurrency) && Equals(_quoteCurrency, other._quoteCurrency);
+        return Equals(BaseCurrency, other.BaseCurrency) && Equals(QuoteCurrency, other.QuoteCurrency);
     }
 
     public override bool Equals(object? obj)
@@ -57,13 +57,13 @@ public class Pair  : IEquatable<Pair>
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(_baseCurrency, _quoteCurrency);
+        return HashCode.Combine(BaseCurrency, QuoteCurrency);
     }
 }
 
 public class Currency : IEquatable<Currency>
 {
-    private string Value { get; }
+    public string Value { get; }
     public Currency(string value)
     {
         if (string.IsNullOrEmpty(value)) throw new Exception("Currency name should not be empty!");

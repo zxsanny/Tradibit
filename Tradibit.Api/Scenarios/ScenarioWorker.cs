@@ -23,8 +23,8 @@ public class ScenarioWorker :
     private readonly IMediator _mediator;
     private readonly TradibitDb _db;
 
-    private static readonly ConcurrentDictionary<(PairIntervalKey PairIntervalKey, Guid StrategyId), Scenario> ActiveScenariosDict = new();
-    private static readonly ConcurrentDictionary<(PairIntervalKey PairIntervalKey, Guid StrategyId), Scenario> ReplyHistoryScenariosDict = new();
+    private static readonly ConcurrentDictionary<(Pair Pair, Guid StrategyId), Scenario> ActiveScenariosDict = new();
+    private static readonly ConcurrentDictionary<(Pair Pair, Guid StrategyId), Scenario> ReplyHistoryScenariosDict = new();
 
     public ScenarioWorker(IMediator mediator, TradibitDb db)
     {
@@ -51,9 +51,9 @@ public class ScenarioWorker :
     public async Task<Unit> Handle(StrategyChangeStatusEvent request, CancellationToken cancellationToken)
     {
         if (request.IsEnabled) 
-            await AddStrategyScenarios(request.StrategyId, isHistory: false, null, null, cancellationToken);
+            await AddStrategyScenarios(request.StrategyId, isHistory: false, null, cancellationToken);
         else
-            await RemoveStrategyScenarios(request.StrategyId, isHistory: false, null, null, cancellationToken);
+            await RemoveStrategyScenarios(request.StrategyId, isHistory: false, cancellationToken);
         
         return Unit.Value;
     }
@@ -63,24 +63,24 @@ public class ScenarioWorker :
         var user = await _mediator.Send(new GetUserByIdRequest(request.UserId), cancellationToken);
         user.HistoryUserState.Add(new UserState { CurrentDeposit = request.Deposit });
         
-        await AddStrategyScenarios(request.StrategyId, isHistory: true, request.Pairs, request.Intervals, cancellationToken);
+        await AddStrategyScenarios(request.StrategyId, isHistory: true, request.Pairs, cancellationToken);
         
         var pairs = request.Pairs ?? await _mediator.Send(new GetMostCapCoinsRequest(), cancellationToken);
-        var intervals = request.Intervals ?? Constants.DefaultIntervals;
         
-        await _mediator.Send(new ReplyHistoryEvent(request.HistorySpan, pairs, intervals), cancellationToken);
+        await _mediator.Send(new ReplyHistoryEvent(request.HistorySpan, pairs), cancellationToken);
 
-        await RemoveStrategyScenarios(request.StrategyId, isHistory: true, pairs, intervals, cancellationToken);
+        await RemoveStrategyScenarios(request.StrategyId, isHistory: true, cancellationToken);
         return Unit.Value;
     }
 
-    private async Task AddStrategyScenarios(Guid strategyId, bool isHistory, List<Pair> pairs, List<Interval> intervals, CancellationToken cancellationToken)
+    private async Task AddStrategyScenarios(Guid strategyId, bool isHistory, List<Pair> pairs, CancellationToken cancellationToken)
     {
         var strategy = await _db.Strategies.FindAsync(strategyId);
-        var scenarios = (await ToPairIntervals(pairs, intervals, cancellationToken)).Select(pairIntervalKey => new Scenario
+        pairs ??= await _mediator.Send(new GetMostCapCoinsRequest(), cancellationToken);
+        var scenarios = pairs.Select(pair => new Scenario
         {
             StrategyId = strategyId,
-            PairIntervalKey = pairIntervalKey,
+            Pair = pair,
             CurrentStepId = strategy!.InitialStepId,
             UserVars = new Dictionary<string, decimal?>()
         }).ToList();
@@ -88,25 +88,18 @@ public class ScenarioWorker :
 
         var scenariosDict = isHistory ? ReplyHistoryScenariosDict : ActiveScenariosDict; 
         foreach (var scenario in scenarios)
-            scenariosDict.TryAdd((scenario.PairIntervalKey, strategyId), scenario);
+            scenariosDict.TryAdd((scenario.Pair, strategyId), scenario);
     }
 
-    private async Task RemoveStrategyScenarios(Guid strategyId, bool isHistory, List<Pair> pairs, List<Interval> intervals, CancellationToken cancellationToken)
+    private async Task RemoveStrategyScenarios(Guid strategyId, bool isHistory, CancellationToken cancellationToken)
     {
         await _db.Scenarios.Where(x => x.StrategyId == strategyId)
             .DeleteAsync(cancellationToken);
         var scenariosDict = isHistory ? ReplyHistoryScenariosDict : ActiveScenariosDict;
-
-        var pairIntervals = await ToPairIntervals(pairs, intervals, cancellationToken);
-        foreach (var pairInterval in pairIntervals)
-            scenariosDict.TryRemove((pairInterval, strategyId), out _);
-    }
-
-    private async Task<List<PairIntervalKey>> ToPairIntervals(List<Pair> pairs, List<Interval> intervals, CancellationToken cancellationToken)
-    {
-        pairs ??= await _mediator.Send(new GetMostCapCoinsRequest(), cancellationToken);
-        intervals ??= Constants.DefaultIntervals;
-        return pairs.SelectMany(_ => intervals, (pair, interval) => new PairIntervalKey(pair, interval)).ToList();
+        
+        var pairs = await _mediator.Send(new GetMostCapCoinsRequest(), cancellationToken);
+        foreach (var pair in pairs)
+            scenariosDict.TryRemove((pair, strategyId), out _);
     }
 
     public async Task Handle(AppInitEvent notification, CancellationToken cancellationToken)
@@ -120,17 +113,19 @@ public class ScenarioWorker :
                 .ThenInclude(x => x.SuccessOperations)
             .ToListAsync(cancellationToken);
         foreach (var scenario in scenarios)
-            ActiveScenariosDict.TryAdd((scenario.PairIntervalKey, scenario.StrategyId), scenario);
+            ActiveScenariosDict.TryAdd((scenario.Pair, scenario.StrategyId), scenario);
     }
 
     public async Task<Unit> Handle(KlineUpdateEvent e, CancellationToken cancellationToken)
     {
+        //TODO: look to the pair
         foreach (var scenario in ActiveScenariosDict)
             await ApplyKlineToScenario(scenario.Value, e, cancellationToken);
 
         return Unit.Value;
     }
 
+    //TODO: Take into account interval
     private async Task ApplyKlineToScenario(Scenario scenario, KlineUpdateEvent e, CancellationToken cancellationToken)
     {
         bool transited;
@@ -169,7 +164,7 @@ public class ScenarioWorker :
 
     public async Task<Unit> Handle(KlineHistoryUpdateEvent e, CancellationToken cancellationToken)
     {
-        if (!ReplyHistoryScenariosDict.TryGetValue((e.PairIntervalKey, e.StrategyId), out var scenario))
+        if (!ReplyHistoryScenariosDict.TryGetValue((e.PairIntervalKey.Pair, e.StrategyId), out var scenario))
             return Unit.Value;
         
         await ApplyKlineToScenario(scenario, e, cancellationToken);

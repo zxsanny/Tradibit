@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using MediatR;
 using Tradibit.SharedUI.DTO;
 using Tradibit.SharedUI.DTO.Primitives;
 
@@ -17,6 +16,8 @@ public class Strategy : BaseTrackableId
     
     public ICollection<Step> Steps { get; set; }
     public ICollection<StrategyUser> Users { get; set; }
+    
+    public ICollection<Scenario> Scenarios { get; set; }
 }
 
 public class Step : BaseTrackableId

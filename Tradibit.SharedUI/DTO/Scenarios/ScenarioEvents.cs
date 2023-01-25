@@ -11,5 +11,4 @@ public class StartBackTestStrategyEvent : IRequest<Unit>
     public decimal Deposit { get; set; }
     public TimeSpan HistorySpan { get; set; }
     public List<Pair>? Pairs { get; set; }
-    public List<Interval>? Intervals { get; set; }
 }
