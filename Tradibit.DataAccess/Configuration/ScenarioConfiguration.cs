@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Newtonsoft.Json;
 using Tradibit.Shared.Entities;
@@ -13,7 +14,11 @@ public class ScenarioConfiguration : IEntityTypeConfiguration<Scenario>
         
         builder.Property(sc => sc.UserVars)
             .HasConversion(v => JsonConvert.SerializeObject(v),
-                v => JsonConvert.DeserializeObject<Dictionary<string, decimal?>>(v) ?? new Dictionary<string, decimal?>());
+                v => JsonConvert.DeserializeObject<Dictionary<string, decimal?>>(v) ?? new Dictionary<string, decimal?>())
+            .Metadata.SetValueComparer(new ValueComparer<Dictionary<string, decimal?>>(
+                (p1, p2) => p1!.SequenceEqual(p2!),
+                list => list.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                list => list));
         
         builder.OwnsOne(sc => sc.Pair, p =>
         {
