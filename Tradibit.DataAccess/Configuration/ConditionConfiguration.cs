@@ -11,7 +11,10 @@ public class ConditionConfiguration : IEntityTypeConfiguration<Condition>
         builder.HasKey(x => x.Id);
 
         builder.OwnsOne(x => x.Operand1);
+        builder.Navigation(x => x.Operand1).IsRequired();
+        
         builder.OwnsOne(x => x.Operand2);
+        builder.Navigation(x => x.Operand2).IsRequired();
 
         builder.HasOne(x => x.Transition)
             .WithMany(x => x.Conditions)

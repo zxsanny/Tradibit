@@ -1,3 +1,4 @@
+using System.Reflection;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -38,7 +39,11 @@ builder.Services
             throw new Exception("Please configure sections TimeoutSeconds and ConnectionStrings in DatabaseOptions in config");
 
         optionsBuilder.UseNpgsql(dbOptions.ConnectionString,
-            sqlOptions => sqlOptions.CommandTimeout(dbOptions.TimeoutSeconds));
+            sqlOptions =>
+            {
+                sqlOptions.MigrationsAssembly(typeof(Program).Assembly.GetName().Name);
+                sqlOptions.CommandTimeout(dbOptions.TimeoutSeconds);
+            });
     });
 
 var authConfig = builder.Configuration.GetSection<AuthConfig>();

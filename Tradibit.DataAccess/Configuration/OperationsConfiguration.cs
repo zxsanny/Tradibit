@@ -28,6 +28,9 @@ public class SetOperandOperationConfiguration : IEntityTypeConfiguration<SetOper
     public void Configure(EntityTypeBuilder<SetOperandBaseOperation> builder)
     {
         builder.OwnsOne(x => x.OperandSource);
+        builder.Navigation(x => x.OperandSource).IsRequired();
+        
         builder.OwnsOne(x => x.OperandTo);
+        builder.Navigation(x => x.OperandTo).IsRequired();
     }
 }

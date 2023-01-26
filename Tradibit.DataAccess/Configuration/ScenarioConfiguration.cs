@@ -17,11 +17,14 @@ public class ScenarioConfiguration : IEntityTypeConfiguration<Scenario>
         
         builder.OwnsOne(sc => sc.Pair, p =>
         {
-            p.OwnsOne(p => p.BaseCurrency);
-            p.OwnsOne(p => p.QuoteCurrency);
+            p.OwnsOne(x => x.BaseCurrency);
+            p.Navigation(x => x.BaseCurrency).IsRequired();
+            
+            p.OwnsOne(x => x.QuoteCurrency);
+            p.Navigation(x => x.QuoteCurrency).IsRequired();
         });
         builder.Navigation(c => c.Pair).IsRequired();
-
+        
         builder.HasOne(x => x.Strategy)
             .WithMany(x => x.Scenarios)
             .HasForeignKey(x => x.StrategyId);
