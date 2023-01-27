@@ -33,9 +33,5 @@ public class ScenarioConfiguration : IEntityTypeConfiguration<Scenario>
         builder.HasOne(x => x.Strategy)
             .WithMany(x => x.Scenarios)
             .HasForeignKey(x => x.StrategyId);
-        
-        
-
-
     }
 }
