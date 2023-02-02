@@ -41,7 +41,7 @@ public class AccountController : Controller, IAccountApi
                 RedirectUri = Url.Action(nameof(LoginCallback), new {returnUrl})
             });
 
-    [HttpGet("Callback")]
+    [HttpGet("callback")]
     [AllowAnonymous]
     public async Task<IActionResult> LoginCallback(string returnUrl)
     {

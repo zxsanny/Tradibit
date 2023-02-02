@@ -21,7 +21,11 @@ builder.Services
     .AddScoped<RequestExt>()
     .AddRefit<IAccountApi>(builder.HostEnvironment.BaseAddress, false)
     .AddRefit<IStrategiesApi>(builder.HostEnvironment.BaseAddress);
-    
+
+builder.Services.AddOidcAuthentication(options =>
+{
+    builder.Configuration.Bind("GoogleAuth", options.ProviderOptions);
+});
 
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<NotificationService>();

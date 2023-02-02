@@ -1,7 +1,5 @@
-using System.Reflection;
 using MediatR;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Tradibit.Api.Services;
@@ -48,23 +46,13 @@ builder.Services
 
 var authConfig = builder.Configuration.GetSection<AuthConfig>();
 
-builder.Services.AddAuthentication(o =>
-    {
-        o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddIdentityServerJwt()
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie()
     .AddGoogle(o =>
     {
-        o.ClientId = authConfig.GoogleAuth.ClientId;
-        o.ClientSecret = authConfig.GoogleAuth.ClientSecret;
+        o.ClientId = authConfig?.GoogleAuth?.ClientId ?? "";
+        o.ClientSecret = authConfig?.GoogleAuth?.ClientSecret ?? "";
     });
-//     .AddJwtBearer(o =>
-// {
-//     o.SecurityTokenValidators.Clear();
-//     o.SecurityTokenValidators.Add(new GoogleTokenValidator());
-// });
     
 builder.Services.AddAuthorization();
 

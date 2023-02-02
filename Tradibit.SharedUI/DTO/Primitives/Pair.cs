@@ -2,10 +2,10 @@
 
 public class Pair  : IEquatable<Pair>
 {
-    private static string SEPARATOR = "";
+    private const string Separator = "";
 
-    public readonly Currency BaseCurrency;
-    public readonly Currency QuoteCurrency;
+    public readonly Currency? BaseCurrency;
+    public readonly Currency? QuoteCurrency;
 
     //for ef-core
     public Pair(){}
@@ -19,18 +19,18 @@ public class Pair  : IEquatable<Pair>
         QuoteCurrency = quoteCurrency;
     }
 
-    public override string ToString() => $"{BaseCurrency}{SEPARATOR}{QuoteCurrency}";
+    public override string ToString() => $"{BaseCurrency}{Separator}{QuoteCurrency}";
 
     public static Pair ParseOrDefault(string input) 
     {
-        var strs = input.Split(SEPARATOR);
-        if (strs.Length != 2 
-            || strs[0].Length < 2 || strs[0].Length > 7
-            || strs[1].Length < 2 || strs[1].Length > 7) 
+        var strings = input.Split(Separator);
+        if (strings.Length != 2 
+            || strings[0].Length < 2 || strings[0].Length > 7
+            || strings[1].Length < 2 || strings[1].Length > 7) 
         {
             return new Pair(Currency.BTC, Currency.USDT);
         }
-        return new Pair(strs[0], strs[1]);
+        return new Pair(strings[0], strings[1]);
     }
     
     public static bool operator ==(Pair? pair1, Pair? pair2)
@@ -66,7 +66,7 @@ public class Pair  : IEquatable<Pair>
 
 public class Currency : IEquatable<Currency>
 {
-    public string Value { get; }
+    private string? Value { get; }
     
     //for ef-core
     public Currency(){}
