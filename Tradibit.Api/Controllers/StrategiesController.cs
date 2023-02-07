@@ -10,16 +10,16 @@ namespace Tradibit.Api.Controllers;
 
 public class StrategiesController : TradibitBaseController, IStrategiesApi
 {
-    public StrategiesController(IMediator mediator, ILogger logger) : base(mediator, logger)
+    public StrategiesController(IMediator mediator, ILogger<StrategiesController> logger) : base(mediator, logger)
     {
     }
 
     [HttpGet("/strategies/dashboard")]
-    public async Task<Response<UserDashboard>> GetUserDashboard(GetCurrentUserDashboardRequest request) =>
+    public async Task<Response<UserDashboard>> GetUserDashboard([FromQuery]GetCurrentUserDashboardRequest request) =>
         await Send(request);
 
     [HttpGet("/strategies/available")]
-    public async Task<Response<List<IdName>>> GetAvailableStrategies(GetAvailableStrategiesRequest request) =>
+    public async Task<Response<List<IdName>>> GetAvailableStrategies([FromQuery]GetAvailableStrategiesRequest request) =>
         await Send(request);
     
     [HttpPost("/strategies/backtest")]

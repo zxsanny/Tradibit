@@ -1,7 +1,10 @@
+using System.Text;
 using MediatR;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Tradibit.Api.Services;
 using Tradibit.DataAccess;
 using Tradibit.Shared.Events;
@@ -46,12 +49,17 @@ builder.Services
 
 var authConfig = builder.Configuration.GetSection<AuthConfig>();
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie()
-    .AddGoogle(o =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddIdentityServerJwt()
+    .AddJwtBearer(o =>
     {
-        o.ClientId = authConfig?.GoogleAuth?.ClientId ?? "";
-        o.ClientSecret = authConfig?.GoogleAuth?.ClientSecret ?? "";
+        o.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidIssuer = "https://localhost:7272",
+            ValidateIssuer = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("skey")),
+            ValidateIssuerSigningKey = true
+        };
     });
     
 builder.Services.AddAuthorization();

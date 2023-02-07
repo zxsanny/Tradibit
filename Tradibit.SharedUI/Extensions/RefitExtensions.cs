@@ -10,7 +10,8 @@ public static class RefitExtensions
 {
     public static IServiceCollection AddRefit<T>(this IServiceCollection services, string apiUrl, bool requireAuthToken = true) where T : class
     {
-        services.TryAddTransient<UserBearerAuthenticationHandler>();
+        if (requireAuthToken) 
+            services.TryAddTransient<UserBearerAuthenticationHandler>();
 
         services.AddRefitClient<T>()
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiUrl))
