@@ -1,9 +1,10 @@
 ﻿@page "/"
+@inherits SenderBase
+
 @using Tradibit.Client.Components
 @using Tradibit.SharedUI.DTO.Dashboard
 @using Tradibit.SharedUI.Interfaces.API
 
-@inject RequestExt RequestExt
 @inject IStrategiesApi StrategiesApi
 
 <PageTitle>Dashboard</PageTitle>
@@ -20,7 +21,7 @@
     
     protected override async Task OnInitializedAsync()
     {
-        _userDashboard = await RequestExt.Send(async () => await StrategiesApi.GetUserDashboard(new GetCurrentUserDashboardRequest()));
+        _userDashboard = await Send(async () => await StrategiesApi.GetUserDashboard(new GetCurrentUserDashboardRequest()));
         
         await base.OnInitializedAsync();
     }

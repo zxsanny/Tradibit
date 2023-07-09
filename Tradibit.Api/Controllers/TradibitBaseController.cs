@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Tradibit.SharedUI.DTO;
 using Tradibit.SharedUI.Extensions;
 
 namespace Tradibit.Api.Controllers;
@@ -22,14 +21,14 @@ public abstract class TradibitBaseController : ControllerBase
         Logger = logger;
     }
     
-    protected async Task<Response<T>> Send<T>(IRequest<T> request)
+    protected async Task<T> Send<T>(IRequest<T> request)
     {
         try
         {
             var res = await Mediator.Send(request);
             if (res == null)
                 throw new Exception($"Request {request.GetType().Name}: {JsonConvert.SerializeObject(request)} returns NULL!");
-            return new Response<T>(res);
+            return res;
         }
         catch (Exception e)
         {

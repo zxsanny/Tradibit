@@ -1,10 +1,11 @@
-﻿@using Tradibit.SharedUI.DTO.Dashboard
+﻿@inherits SenderBase
+
+@using Tradibit.SharedUI.DTO.Dashboard
 @using Tradibit.SharedUI.DTO.Primitives
 @using Tradibit.SharedUI.DTO.Scenarios
 @using Tradibit.SharedUI.Interfaces
 @using Tradibit.SharedUI.Interfaces.API
 
-@inject RequestExt RequestExt
 @inject IStrategiesApi StrategiesApi
 @inject ITokenProvider TokenProvider
 
@@ -30,16 +31,16 @@
 <RadzenButton Click="@(async () => await AddStrategy())" Text="Add" ButtonStyle="ButtonStyle.Primary" />
 
 @code {
-
+    
     private Guid? _selectedStrategyId;
     private List<IdName>? _availableStrategies;
 
     [Parameter]
     public List<ScenarioDto> ScenarioDtos { get; set; } = new();
-
+    
     protected override async Task OnInitializedAsync()
     {
-        _availableStrategies = await RequestExt.Send(async () => await StrategiesApi.GetAvailableStrategies(new GetAvailableStrategiesRequest()));
+        _availableStrategies = await Send(async () => await StrategiesApi.GetAvailableStrategies(new GetAvailableStrategiesRequest()));
     }
 
     private void SelectStrategy(Guid strategyId)
@@ -53,6 +54,6 @@
             return;
         
         var addStrategyToUser = new AddStrategyToUserRequest(await TokenProvider.GetCurrentUserId(cancellationToken), _selectedStrategyId.Value);
-        await RequestExt.Send(async () => await StrategiesApi.AddStrategyToUser(addStrategyToUser));
+        await Send(async () => await StrategiesApi.AddStrategyToUser(addStrategyToUser));
     }
 }

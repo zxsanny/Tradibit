@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Tradibit.DataAccess;
+using Tradibit.Shared;
 using Tradibit.Shared.Entities;
 using Tradibit.Shared.Events;
 using Tradibit.SharedUI;

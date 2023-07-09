@@ -15,22 +15,22 @@ public class StrategiesController : TradibitBaseController, IStrategiesApi
     }
 
     [HttpGet("/strategies/dashboard")]
-    public async Task<Response<UserDashboard>> GetUserDashboard([FromQuery]GetCurrentUserDashboardRequest request) =>
+    public async Task<UserDashboard> GetUserDashboard([FromQuery]GetCurrentUserDashboardRequest request) =>
         await Send(request);
 
     [HttpGet("/strategies/available")]
-    public async Task<Response<List<IdName>>> GetAvailableStrategies([FromQuery]GetAvailableStrategiesRequest request) =>
+    public async Task<List<IdName>> GetAvailableStrategies([FromQuery]GetAvailableStrategiesRequest request) =>
         await Send(request);
     
     [HttpPost("/strategies/backtest")]
-    public async Task<Response> BackTestStrategy(StartBackTestStrategyEvent e) =>
+    public async Task BackTestStrategy(StartBackTestStrategyEvent e) =>
         await Send(e);
     
     [HttpPost("/strategies/user")]
-    public async Task<Response> AddStrategyToUser(AddStrategyToUserRequest request) =>
+    public async Task AddStrategyToUser(AddStrategyToUserRequest request) =>
         await Send(request);
 
     [HttpDelete("/strategies/user")]
-    public async Task<Response> RemoveStrategyFromUser(RemoveStrategyFromUserRequest request) =>
+    public async Task RemoveStrategyFromUser(RemoveStrategyFromUserRequest request) =>
         await Send(request);
 }

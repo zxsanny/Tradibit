@@ -1,7 +1,7 @@
 using MediatR;
 using Tradibit.Shared.Entities;
 
-namespace Tradibit.Shared.Events;
+namespace Tradibit.Shared;
 
 public class GetUserByIdRequest : IRequest<User>
 {

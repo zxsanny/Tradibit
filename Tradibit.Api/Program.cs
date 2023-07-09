@@ -10,6 +10,7 @@ using Tradibit.DataAccess;
 using Tradibit.Shared.Events;
 using Tradibit.Shared.Extensions;
 using Tradibit.Shared.MappingProfiles;
+using Tradibit.SharedUI.DTO.Auth;
 using Tradibit.SharedUI.DTO.SettingsDTO;
 using Tradibit.SharedUI.Interfaces;
 
@@ -50,14 +51,17 @@ builder.Services
 var authConfig = builder.Configuration.GetSection<AuthConfig>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddIdentityServerJwt()
     .AddJwtBearer(o =>
     {
         o.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidIssuer = "https://localhost:7272",
+            ValidIssuer = authConfig.Issuer,
             ValidateIssuer = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("skey")),
+            
+            ValidAudience = authConfig.Audience,
+            ValidateAudience = true,
+            
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authConfig.Key)),
             ValidateIssuerSigningKey = true
         };
     });
@@ -82,6 +86,9 @@ app.UseHttpsRedirection();
 
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseRouting();
 
