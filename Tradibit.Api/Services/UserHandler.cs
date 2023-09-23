@@ -46,12 +46,10 @@ public class UserHandler :
 
     private string GetToken(User user)
     {
-        var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_authConfig.Key));
+        var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_authConfig.JwtSecret!));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var jwtToken = new JwtSecurityToken(
-            issuer: _authConfig.Issuer,
-            audience: _authConfig.Audience,
             expires: DateTime.Now.AddSeconds(_authConfig.TokenExpireSeconds),
             signingCredentials: credentials,
             claims: user.ToClaims());

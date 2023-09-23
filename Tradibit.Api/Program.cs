@@ -1,15 +1,15 @@
 using System.Text;
 using MediatR;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Tradibit.Api.Services;
 using Tradibit.DataAccess;
+using Tradibit.Shared;
 using Tradibit.Shared.Events;
 using Tradibit.Shared.Extensions;
 using Tradibit.Shared.MappingProfiles;
+using Tradibit.SharedUI;
 using Tradibit.SharedUI.DTO.Auth;
 using Tradibit.SharedUI.DTO.SettingsDTO;
 using Tradibit.SharedUI.Interfaces;
@@ -49,19 +49,29 @@ builder.Services
     });
 
 var authConfig = builder.Configuration.GetSection<AuthConfig>();
+if (string.IsNullOrEmpty(authConfig.ClientId) || string.IsNullOrEmpty(authConfig.ClientSecret) || string.IsNullOrEmpty(authConfig.JwtSecret))
+    throw new Exception("Please ensure AuthConfig:ClientId and ClientSecret are presented in appsettings.json ");
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services
+    .AddAuthentication(o => o.DefaultScheme = Constants.APP_AUTH_SCHEME)
+    .AddCookie(Constants.APP_AUTH_SCHEME, o => o.ExpireTimeSpan = TimeSpan.FromSeconds(authConfig.TokenExpireSeconds))
+    .AddGoogle(o =>
+    {
+        o.SignInScheme = Constants.APP_AUTH_SCHEME;
+        o.ClientId = authConfig.ClientId;
+        o.ClientSecret = authConfig.ClientSecret;
+        o.CorrelationCookie.SameSite = SameSiteMode.Lax;
+        o.CorrelationCookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    })
     .AddJwtBearer(o =>
     {
+        o.RequireHttpsMetadata = false;
         o.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidIssuer = authConfig.Issuer,
-            ValidateIssuer = true,
-            
-            ValidAudience = authConfig.Audience,
-            ValidateAudience = true,
-            
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authConfig.Key)),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authConfig.JwtSecret)),
             ValidateIssuerSigningKey = true
         };
     });

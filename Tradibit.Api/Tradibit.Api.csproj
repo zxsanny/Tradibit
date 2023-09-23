@@ -20,15 +20,12 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.0" />
     <PackageReference Include="Skender.Stock.Indicators" Version="2.4.0" />
     <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="7.18.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Client\Tradibit.Client.csproj" />
     <ProjectReference Include="..\Tradibit.DataAccess\Tradibit.DataAccess.csproj" />
-    <ProjectReference Include="..\Tradibit.SharedUI\Tradibit.SharedUI.csproj" />
   </ItemGroup>
 
 

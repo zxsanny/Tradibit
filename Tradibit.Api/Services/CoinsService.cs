@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Options;
+using Tradibit.Shared;
 using Tradibit.SharedUI;
 using Tradibit.SharedUI.DTO.Coins;
 using Tradibit.SharedUI.DTO.Primitives;

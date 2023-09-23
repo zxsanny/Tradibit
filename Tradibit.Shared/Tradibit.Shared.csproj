@@ -27,8 +27,6 @@
       <PackageReference Include="Skender.Stock.Indicators" Version="2.4.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Tradibit.SharedUI\Tradibit.SharedUI.csproj" />
-    </ItemGroup>
+
 
 </Project>

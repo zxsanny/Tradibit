@@ -3,15 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.32916.344
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tradibit.Client", "Client\Tradibit.Client.csproj", "{A2B3BAB8-455C-43C6-BAD8-B56FCFDDF514}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tradibit.Shared", "Tradibit.Shared\Tradibit.Shared.csproj", "{29AC0D57-6876-43E7-B33E-30603501276A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tradibit.Api.Test", "Tradibit.Api.Test\Tradibit.Api.Test.csproj", "{B72E87FA-36F0-4595-B5BC-066CC70B4C73}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tradibit.DataAccess", "Tradibit.DataAccess\Tradibit.DataAccess.csproj", "{5F146A3E-57AC-4CD6-B832-548A1F436447}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tradibit.SharedUI", "Tradibit.SharedUI\Tradibit.SharedUI.csproj", "{8C98BC2B-1E82-4EA8-B9A1-1D442E77BD5B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Readme", "Readme", "{D9AD6A9C-AD36-486A-8090-0C836B33DE87}"
 	ProjectSection(SolutionItems) = preProject
@@ -26,10 +22,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A2B3BAB8-455C-43C6-BAD8-B56FCFDDF514}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A2B3BAB8-455C-43C6-BAD8-B56FCFDDF514}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A2B3BAB8-455C-43C6-BAD8-B56FCFDDF514}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A2B3BAB8-455C-43C6-BAD8-B56FCFDDF514}.Release|Any CPU.Build.0 = Release|Any CPU
 		{29AC0D57-6876-43E7-B33E-30603501276A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{29AC0D57-6876-43E7-B33E-30603501276A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29AC0D57-6876-43E7-B33E-30603501276A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -42,10 +34,6 @@ Global
 		{5F146A3E-57AC-4CD6-B832-548A1F436447}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F146A3E-57AC-4CD6-B832-548A1F436447}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F146A3E-57AC-4CD6-B832-548A1F436447}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8C98BC2B-1E82-4EA8-B9A1-1D442E77BD5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8C98BC2B-1E82-4EA8-B9A1-1D442E77BD5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8C98BC2B-1E82-4EA8-B9A1-1D442E77BD5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8C98BC2B-1E82-4EA8-B9A1-1D442E77BD5B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2F81CC0D-A38C-49DA-BBD9-801733021A1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2F81CC0D-A38C-49DA-BBD9-801733021A1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F81CC0D-A38C-49DA-BBD9-801733021A1B}.Release|Any CPU.ActiveCfg = Release|Any CPU

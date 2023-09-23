@@ -1,23 +1,17 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Security.Claims;
-using System.Text;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Tradibit.Shared.Entities;
-using Tradibit.SharedUI.DTO;
 using Tradibit.SharedUI.DTO.Auth;
 using Tradibit.SharedUI.DTO.Users;
-using Tradibit.SharedUI.Interfaces.API;
 
 namespace Tradibit.Api.Controllers;
 
 [ApiExplorerSettings(IgnoreApi=true)]
-public class AccountController : TradibitBaseController, IAccountApi
+public class AccountController : TradibitBaseController
 {
     private readonly IMediator _mediator;
     private readonly AuthConfig _authConfig;

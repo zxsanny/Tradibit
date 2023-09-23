@@ -7,12 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Tradibit.SharedUI\Tradibit.SharedUI.csproj" />
       <ProjectReference Include="..\Tradibit.Shared\Tradibit.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.2" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.10" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
     </ItemGroup>
 
 </Project>

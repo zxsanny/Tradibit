@@ -1,14 +1,12 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Tradibit.SharedUI.DTO;
 using Tradibit.SharedUI.DTO.Dashboard;
 using Tradibit.SharedUI.DTO.Primitives;
 using Tradibit.SharedUI.DTO.Scenarios;
-using Tradibit.SharedUI.Interfaces.API;
 
 namespace Tradibit.Api.Controllers;
 
-public class StrategiesController : TradibitBaseController, IStrategiesApi
+public class StrategiesController : TradibitBaseController
 {
     public StrategiesController(IMediator mediator, ILogger<StrategiesController> logger) : base(mediator, logger)
     {

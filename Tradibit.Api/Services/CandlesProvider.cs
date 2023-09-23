@@ -4,6 +4,7 @@ using Binance.Net.Interfaces;
 using CryptoExchange.Net.Sockets;
 using MediatR;
 using Skender.Stock.Indicators;
+using Tradibit.Shared;
 using Tradibit.Shared.Events;
 using Tradibit.SharedUI;
 using Tradibit.SharedUI.DTO;
