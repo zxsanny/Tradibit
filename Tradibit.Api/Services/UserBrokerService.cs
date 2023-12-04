@@ -3,9 +3,10 @@ using Binance.Net.Objects.Models.Spot.Socket;
 using CryptoExchange.Net.Sockets;
 using MediatR;
 using Tradibit.DataAccess;
-using Tradibit.SharedUI.DTO.Coins;
-using Tradibit.SharedUI.DTO.Primitives;
-using Tradibit.SharedUI.DTO.UserBroker;
+using Tradibit.Shared.DTO.Coins;
+using Tradibit.Shared.DTO.Primitives;
+using Tradibit.Shared.DTO.UserBroker;
+using Tradibit.Shared.DTO.Users;
 using Tradibit.SharedUI.DTO.Users;
 using OrderSide = Binance.Net.Enums.OrderSide;
 

@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using System.Security.Claims;
+using Tradibit.Shared.DTO;
+using Tradibit.Shared.DTO.Users;
 using Tradibit.SharedUI.DTO;
 using Tradibit.SharedUI.DTO.Users;
 
@@ -14,16 +16,14 @@ public class User : BaseTrackableId
     public string BinanceKeyHash { get; set; }
     public string BinanceSecretHash { get; set; }
 
-    public List<UserPermission> Permissions { get; set; }
+    public List<UserRole> Roles { get; set; }
+    public List<Strategy> UserStrategies { get; set; }
     
     public string BinanceKey => EncryptionService.Decrypt(BinanceKeyHash);
     public string BinanceSecret => EncryptionService.Decrypt(BinanceSecretHash);
 
     public UserSettings UserSettings { get; set; }
-    
     public UserState UserState { get; set; }
-    
-    public ICollection<UserState> HistoryUserState { get; set; }
     
     public IEnumerable<Claim> ToClaims()
     {
@@ -33,9 +33,6 @@ public class User : BaseTrackableId
             new (ClaimTypes.Name, Name),
             new (ClaimTypes.Email, Email),
         };
-        
-        foreach (var permission in Permissions) 
-            claims.Add(new Claim(permission.ToString(), permission.ToString()));
         
         return claims;
     }

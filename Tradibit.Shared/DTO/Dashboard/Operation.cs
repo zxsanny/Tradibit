@@ -1,6 +1,6 @@
-using Tradibit.SharedUI.DTO.Primitives;
+using Tradibit.Shared.DTO.Primitives;
 
-namespace Tradibit.SharedUI.DTO.Dashboard;
+namespace Tradibit.Shared.DTO.Dashboard;
 
 public class Operation
 {

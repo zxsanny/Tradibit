@@ -1,4 +1,4 @@
-﻿namespace Tradibit.SharedUI.DTO.Dashboard;
+﻿namespace Tradibit.Shared.DTO.Dashboard;
 
 public class UserDashboard
 {

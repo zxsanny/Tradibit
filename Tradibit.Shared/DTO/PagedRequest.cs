@@ -1,6 +1,6 @@
-﻿using Tradibit.SharedUI.DTO.Primitives;
+﻿using Tradibit.Shared.DTO.Primitives;
 
-namespace Tradibit.SharedUI.DTO;
+namespace Tradibit.Shared.DTO;
 
 /// <summary> </summary>
 public abstract class PagedRequest
@@ -15,7 +15,7 @@ public abstract class PagedRequest
 public abstract class PagedSortedRequest : PagedRequest
 {
     /// <summary> </summary>
-    public string? FieldName { get; set; }
+    public string FieldName { get; set; }
 
     /// <summary> </summary>
     public SortDirection

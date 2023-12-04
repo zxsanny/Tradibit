@@ -6,12 +6,13 @@ using Microsoft.IdentityModel.Tokens;
 using Tradibit.Api.Services;
 using Tradibit.DataAccess;
 using Tradibit.Shared;
-using Tradibit.Shared.Events;
+using Tradibit.Shared.DTO;
+using Tradibit.Shared.DTO.Auth;
+using Tradibit.Shared.DTO.SettingsDTO;
 using Tradibit.Shared.Extensions;
+using Tradibit.Shared.Interfaces;
 using Tradibit.Shared.MappingProfiles;
 using Tradibit.SharedUI;
-using Tradibit.SharedUI.DTO.Auth;
-using Tradibit.SharedUI.DTO.SettingsDTO;
 using Tradibit.SharedUI.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);

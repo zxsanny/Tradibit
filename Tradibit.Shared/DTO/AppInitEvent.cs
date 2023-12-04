@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Tradibit.Shared.Events;
+namespace Tradibit.Shared.DTO;
 
 public class AppInitEvent : INotification
 {

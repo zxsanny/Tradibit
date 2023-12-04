@@ -11,11 +11,11 @@ public static class AssemblyExt
     /// </summary>
     public static Assembly[] GetAllOwnReferencedAssemblies()
     {
-        var currentAsmName = Assembly.GetEntryAssembly()!.GetName().Name;
+        var currentAsmName = Assembly.GetEntryAssembly()!.GetName().Name!;
         if (!currentAsmName.Contains('.'))
             return new[] { Assembly.GetExecutingAssembly() };
         var prefix = currentAsmName![..currentAsmName.IndexOf('.')];
-        return Assembly.GetEntryAssembly().GetAllReferencedAssemblies(prefix).ToArray();
+        return Assembly.GetEntryAssembly()!.GetAllReferencedAssemblies(prefix).ToArray();
     }
 
     /// <summary> </summary>

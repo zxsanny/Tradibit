@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
+using Tradibit.Shared.DTO;
+using Tradibit.Shared.DTO.Primitives;
 using Tradibit.SharedUI.DTO;
-using Tradibit.SharedUI.DTO.Primitives;
 
 namespace Tradibit.SharedUI.Extensions;
 
@@ -84,7 +85,7 @@ public static class QueryableExtensions
             _ => query
         };
     }
-
+    
     private static LambdaExpression CreateExpression(Type type, string propertyName)
     {
         var param = Expression.Parameter(type, "x");

@@ -1,4 +1,4 @@
-﻿namespace Tradibit.SharedUI.DTO.Primitives;
+﻿namespace Tradibit.Shared.DTO.Primitives;
 
 public class IdName
 {

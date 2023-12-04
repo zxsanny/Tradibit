@@ -1,4 +1,4 @@
-﻿namespace Tradibit.SharedUI.DTO;
+﻿namespace Tradibit.Shared.DTO;
 
 public class ProfitLossStat
 {

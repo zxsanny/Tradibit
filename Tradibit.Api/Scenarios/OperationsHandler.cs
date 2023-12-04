@@ -1,9 +1,8 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Tradibit.DataAccess;
+using Tradibit.Shared.DTO.Primitives;
+using Tradibit.Shared.DTO.UserBroker;
 using Tradibit.Shared.Entities;
-using Tradibit.SharedUI.DTO.Primitives;
-using Tradibit.SharedUI.DTO.UserBroker;
 
 namespace Tradibit.Api.Scenarios;
 
@@ -22,40 +21,32 @@ public class OperationsHandler :
     
     public async Task<Unit> Handle(OrderBaseOperation request, CancellationToken cancellationToken)
     {
-        var users = await _db.StrategyUsers
-            .Where(x => x.StrategyId == request.Scenario.StrategyId)
-            .Select(x => x.User)
-            .Include(x => x.UserState)
-            .Include(x => x.UserSettings)
-            .ToListAsync(cancellationToken);
+        var user = request.Scenario.User;
         
-        foreach (var user in users)
+        var pairInterval = request.KlineUpdateEvent.PairInterval;
+        if (request.OrderSide == OrderSide.BUY)
         {
-            var pair = request.KlineUpdateEvent.PairIntervalKey.Pair;
-            if (request.OrderSide == OrderSide.BUY)
-            {
-                var maxTrades = user.UserSettings.MaxActiveTradings;
-                var activeTrades = user.UserState.ActivePairs.Count;
-                if (maxTrades == activeTrades)
-                    continue;
-                
-                var amount = user.UserState.CurrentDeposit / ( maxTrades - activeTrades);
-                var boughtAmount = await _mediator.Send(new BuyEvent(user.Id, request.KlineUpdateEvent.PairIntervalKey.Pair, amount), cancellationToken);
-                user.UserState.ActivePairs.Add(new ActivePair(pair, boughtAmount));
-                user.UserState.CurrentDeposit -= amount;
-                await _db.Save(user.UserState, cancellationToken);
-            }
-            else
-            {
-                var activePair = user.UserState.ActivePairs.FirstOrDefault(x => x.Pair == pair);
-                if (activePair == null)
-                    continue;
+            var maxTrades = user.UserSettings.MaxActiveTrades;
+            var activeTrades = user.UserState.ActivePairs.Count;
+            if (maxTrades == activeTrades)
+                return Unit.Value;
+            
+            var amount = user.UserState.CurrentDeposit / ( maxTrades - activeTrades);
+            var boughtAmount = await _mediator.Send(new BuyEvent(user.Id, pairInterval.Pair, amount), cancellationToken);
+            user.UserState.ActivePairs.Add(new ActivePair(pairInterval, boughtAmount));
+            user.UserState.CurrentDeposit -= amount;
+            await _db.Save(user.UserState, cancellationToken);
+        }
+        else
+        {
+            var activePair = user.UserState.ActivePairs.FirstOrDefault(x => x.PairInterval == pairInterval);
+            if (activePair == null)
+                return Unit.Value;
 
-                var soldAmount = await _mediator.Send(new SellEvent(user.Id, pair, activePair.Amount), cancellationToken);
-                user.UserState.ActivePairs.Remove(activePair);
-                user.UserState.CurrentDeposit += soldAmount;
-                await _db.Save(user.UserState, cancellationToken);
-            }
+            var soldAmount = await _mediator.Send(new SellEvent(user.Id, pairInterval.Pair, activePair.Amount), cancellationToken);
+            user.UserState.ActivePairs.Remove(activePair);
+            user.UserState.CurrentDeposit += soldAmount;
+            await _db.Save(user.UserState, cancellationToken);
         }
         return Unit.Value;
     }

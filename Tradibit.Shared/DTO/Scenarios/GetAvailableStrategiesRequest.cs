@@ -1,7 +1,7 @@
 using MediatR;
-using Tradibit.SharedUI.DTO.Primitives;
+using Tradibit.Shared.DTO.Primitives;
 
-namespace Tradibit.SharedUI.DTO.Scenarios;
+namespace Tradibit.Shared.DTO.Scenarios;
 
 public class GetAvailableStrategiesRequest : IRequest<List<IdName>>
 {

@@ -1,6 +1,7 @@
 using MediatR;
+using Tradibit.Shared.DTO;
+using Tradibit.Shared.DTO.Primitives;
 using Tradibit.SharedUI.DTO;
-using Tradibit.SharedUI.DTO.Primitives;
 
 namespace Tradibit.Shared.Entities;
 

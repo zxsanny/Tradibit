@@ -20,15 +20,19 @@ public class ScenarioConfiguration : IEntityTypeConfiguration<Scenario>
                 list => list.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                 list => list));
         
-        builder.OwnsOne(sc => sc.Pair, p =>
+        builder.OwnsOne(sc => sc.PairInterval, p =>
         {
-            p.OwnsOne(x => x.BaseCurrency);
-            p.Navigation(x => x.BaseCurrency).IsRequired();
-            
-            p.OwnsOne(x => x.QuoteCurrency);
-            p.Navigation(x => x.QuoteCurrency).IsRequired();
+            p.OwnsOne(x => x.Pair, pair =>
+            {
+                pair.OwnsOne(x => x.BaseCurrency);
+                pair.Navigation(x => x.BaseCurrency).IsRequired();
+                
+                pair.OwnsOne(x => x.QuoteCurrency);
+                pair.Navigation(x => x.QuoteCurrency).IsRequired();
+            });
+            p.Navigation(x => x.Pair).IsRequired();
         });
-        builder.Navigation(c => c.Pair).IsRequired();
+        builder.Navigation(c => c.PairInterval).IsRequired();
         
         builder.HasOne(x => x.Strategy)
             .WithMany(x => x.Scenarios)

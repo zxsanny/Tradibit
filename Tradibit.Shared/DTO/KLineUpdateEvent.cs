@@ -1,27 +1,27 @@
 ﻿using MediatR;
-using Tradibit.SharedUI.DTO.Primitives;
+using Tradibit.Shared.DTO.Primitives;
 
-namespace Tradibit.SharedUI.DTO;
+namespace Tradibit.Shared.DTO;
 
 public class KlineUpdateEvent : IRequest<Unit>
 {
-    public PairIntervalKey PairIntervalKey { get; set; }
+    public PairInterval PairInterval { get; set; }
     public QuoteIndicator QuoteIndicator { get; set; }
     
-    public KlineUpdateEvent(PairIntervalKey pairIntervalKey, QuoteIndicator quoteIndicator)
+    public KlineUpdateEvent(PairInterval pairInterval, QuoteIndicator quoteIndicator)
     {
-        PairIntervalKey = pairIntervalKey;
+        PairInterval = pairInterval;
         QuoteIndicator = quoteIndicator;
     }
 }
 
 public class KlineHistoryUpdateEvent : KlineUpdateEvent
 {
-    public Guid StrategyId { get; set; }
+    public Guid BackTestRunId { get; set; }
 
-    public KlineHistoryUpdateEvent(Guid strategyId, KlineUpdateEvent klineUpdateEvent) 
-        : base(klineUpdateEvent.PairIntervalKey, klineUpdateEvent.QuoteIndicator)
+    public KlineHistoryUpdateEvent(Guid backTestRunId, PairInterval pairInterval, QuoteIndicator quoteIndicator) 
+        : base(pairInterval, quoteIndicator)
     {
-        StrategyId = strategyId;
+        BackTestRunId = backTestRunId;
     }
 }

@@ -7,14 +7,14 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Tradibit.DataAccess;
 using Tradibit.Shared;
+using Tradibit.Shared.DTO.Auth;
 using Tradibit.Shared.Entities;
-using Tradibit.SharedUI.DTO.Auth;
 using Tradibit.SharedUI.DTO.Users;
 
 namespace Tradibit.Api.Services;
 
 public class UserHandler :
-    IRequestHandler<GetUserByIdRequest, User>,
+    IRequestHandler<GetUserByIdRequest, User?>,
     IRequestHandler<RegisterUserRequest, string>
 {
     private readonly IMediator _mediator;
@@ -30,11 +30,10 @@ public class UserHandler :
         _authConfig = authConfig.Value;
     }
 
-    public async Task<User> Handle(GetUserByIdRequest request, CancellationToken cancellationToken) =>
+    public async Task<User?> Handle(GetUserByIdRequest request, CancellationToken cancellationToken) =>
         await _db.Users
             .Include(x => x.UserState)
             .Include(x => x.UserSettings)
-            .Include(x => x.HistoryUserState)
             .FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
 
     public async Task<string> Handle(RegisterUserRequest request, CancellationToken cancellationToken)

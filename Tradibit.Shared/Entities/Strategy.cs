@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+using Tradibit.Shared.DTO;
+using Tradibit.Shared.DTO.Primitives;
 using Tradibit.SharedUI.DTO;
-using Tradibit.SharedUI.DTO.Primitives;
 
 namespace Tradibit.Shared.Entities;
 
@@ -12,12 +13,12 @@ public class Strategy : BaseTrackableId
     public Guid InitialStepId { get; set; }
     
     public bool IsPublic { get; set; }
-    public bool IsActive { get; set; }
     
-    public ICollection<Step> Steps { get; set; }
-    public ICollection<StrategyUser> Users { get; set; }
+    public List<Step> Steps { get; set; }
+    public List<Scenario> Scenarios { get; set; }
     
-    public ICollection<Scenario> Scenarios { get; set; }
+    public Guid OwnerUserId { get; set; }
+    public User OwnerUser { get; set; }
 }
 
 public class Step : BaseTrackableId
@@ -39,6 +40,9 @@ public class Transition : BaseTrackableId
     
     public ICollection<Condition> Conditions { get; set; }
     public ICollection<BaseOperation> SuccessOperations { get; set; }
+
+    public bool MeetConditions(Scenario scenario, QuoteIndicator quoteIndicator) => 
+        Conditions.All(c => c.Meet(scenario, quoteIndicator));
 }
 
 public class Condition : BaseTrackableId

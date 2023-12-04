@@ -1,4 +1,4 @@
-namespace Tradibit.SharedUI.Interfaces;
+namespace Tradibit.Shared.Interfaces;
 
 public interface ICandlesProvider
 {

@@ -1,4 +1,4 @@
-namespace Tradibit.SharedUI.DTO.Users;
+namespace Tradibit.Shared.DTO.Users;
 
 public enum UserPermission
 {

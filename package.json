@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@auth/core": "^0.15.1",
+    "@auth/sveltekit": "^0.3.7",
+    "npm": "^10.1.0"
+  }
+}

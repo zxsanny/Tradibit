@@ -1,6 +1,7 @@
 ﻿using System.Security.Authentication;
 using Duende.IdentityServer.Models;
 using Newtonsoft.Json;
+using Tradibit.Shared.DTO.Users;
 using Tradibit.SharedUI.DTO.Users;
 using Tradibit.SharedUI.Interfaces;
 

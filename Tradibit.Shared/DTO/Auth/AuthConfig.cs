@@ -1,4 +1,4 @@
-﻿namespace Tradibit.SharedUI.DTO.Auth;
+﻿namespace Tradibit.Shared.DTO.Auth;
 
 public class AuthConfig
 {

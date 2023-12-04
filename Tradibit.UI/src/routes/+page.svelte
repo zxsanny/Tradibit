@@ -11,14 +11,20 @@
 
 <section>
 	<h1>
+		<a href="/protected">protected route</a>
 		<span class="welcome">
 			<picture>
 				<source srcset={welcome} type="image/webp" />
 				<img src={welcome_fallback} alt="Welcome" />
 			</picture>
 		</span>
-		to your new SvelteKit app!
+
+		to your new<br />SvelteKit app
 	</h1>
+
+	<h2>
+		try editing <strong>src/routes/+page.svelte</strong>
+	</h2>
 
 	<Counter />
 </section>

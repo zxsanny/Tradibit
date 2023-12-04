@@ -3,7 +3,7 @@ using Tradibit.Shared.Entities;
 
 namespace Tradibit.Shared;
 
-public class GetUserByIdRequest : IRequest<User>
+public class GetUserByIdRequest : IRequest<User?>
 {
     public Guid UserId { get; set; }
 

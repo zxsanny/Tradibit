@@ -1,17 +1,18 @@
 ﻿using MediatR;
-using Tradibit.SharedUI.DTO.Primitives;
+using Tradibit.Shared.DTO.Primitives;
 
-namespace Tradibit.SharedUI.DTO.Scenarios;
+namespace Tradibit.Shared.DTO.Scenarios;
 
 public class ReplyHistoryEvent : IRequest<Unit>
 {
-    public Guid StrategyId { get; set; }
+    public Guid BackTestRunId { get; set; }
     public TimeSpan HistorySpan { get; set; }
-    public List<Pair>? Pairs { get; set; }
-
-    public ReplyHistoryEvent(TimeSpan historySpan, List<Pair> pairs)
+    public IEnumerable<PairInterval> PairIntervals { get; set; }
+    
+    public ReplyHistoryEvent(Guid backTestRunId, TimeSpan historySpan, IEnumerable<PairInterval> pairIntervals)
     {
+        BackTestRunId = backTestRunId;
         HistorySpan = historySpan;
-        Pairs = pairs;
+        PairIntervals = pairIntervals;
     }
 }

@@ -1,11 +1,11 @@
-﻿namespace Tradibit.SharedUI.DTO.Primitives;
+﻿namespace Tradibit.Shared.DTO.Primitives;
 
-public class Pair  : IEquatable<Pair>
+public class Pair : IEquatable<Pair>
 {
     private const string Separator = "";
 
-    public readonly Currency? BaseCurrency;
-    public readonly Currency? QuoteCurrency;
+    public readonly Currency BaseCurrency;
+    public readonly Currency QuoteCurrency;
 
     //for ef-core
     public Pair(){}
@@ -21,15 +21,14 @@ public class Pair  : IEquatable<Pair>
 
     public override string ToString() => $"{BaseCurrency}{Separator}{QuoteCurrency}";
 
-    public static Pair ParseOrDefault(string input) 
+    public static Pair Parse(string input) 
     {
         var strings = input.Split(Separator);
         if (strings.Length != 2 
             || strings[0].Length < 2 || strings[0].Length > 7
-            || strings[1].Length < 2 || strings[1].Length > 7) 
-        {
-            return new Pair(Currency.BTC, Currency.USDT);
-        }
+            || strings[1].Length < 2 || strings[1].Length > 7)
+            throw new Exception("Can't parse pair");
+        
         return new Pair(strings[0], strings[1]);
     }
     
@@ -62,11 +61,13 @@ public class Pair  : IEquatable<Pair>
     {
         return HashCode.Combine(BaseCurrency, QuoteCurrency);
     }
+
+    public static readonly Pair BTC_USDT = new(Currency.BTC, Currency.USDT);
 }
 
 public class Currency : IEquatable<Currency>
 {
-    private string? Value { get; }
+    private string Value { get; }
     
     //for ef-core
     public Currency(){}
@@ -79,7 +80,7 @@ public class Currency : IEquatable<Currency>
         Value = value;
     }
 
-    public override string? ToString() => Value;
+    public override string ToString() => Value;
 
     public static bool operator ==(Currency? currency1, Currency? currency2)
     {
@@ -101,7 +102,7 @@ public class Currency : IEquatable<Currency>
     public override int GetHashCode() =>
         Value?.GetHashCode() ?? 0;
 
-    public static implicit operator string?(Currency currency) => 
+    public static implicit operator string(Currency currency) => 
         currency.Value;
 
     public static readonly Currency USDT = new("USDT");

@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 using Tradibit.DataAccess;
 using Tradibit.Shared;
 using Tradibit.Shared.Entities;
-using Tradibit.SharedUI.DTO.SettingsDTO;
+using Tradibit.Shared.DTO.SettingsDTO;
 
 namespace Tradibit.Api.Services;
 

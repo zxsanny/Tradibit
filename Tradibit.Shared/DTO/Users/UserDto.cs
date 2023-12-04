@@ -1,4 +1,7 @@
-﻿namespace Tradibit.SharedUI.DTO.Users;
+﻿using Tradibit.Shared.DTO;
+using Tradibit.Shared.DTO.Users;
+
+namespace Tradibit.SharedUI.DTO.Users;
 
 public class UserDto : BaseTrackableId
 {

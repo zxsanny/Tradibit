@@ -1,5 +1,5 @@
 ﻿using MediatR;
 
-namespace Tradibit.SharedUI.DTO.Dashboard;
+namespace Tradibit.Shared.DTO.Dashboard;
 
 public class GetCurrentUserDashboardRequest : IRequest<UserDashboard> { }

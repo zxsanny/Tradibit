@@ -1,4 +1,5 @@
-﻿using Tradibit.SharedUI.DTO.Primitives;
+﻿using Tradibit.Shared.DTO.Primitives;
+using Tradibit.Shared.Entities;
 
 namespace Tradibit.Shared;
 
@@ -15,7 +16,7 @@ public static class Constants
     
     public static readonly List<Interval> DefaultIntervals = new()
     {
-        Interval.I_15_MIN,
-        Interval.I_2_HOUR
+        Interval.I_5_MIN,
+        Interval.I_1_HOUR
     };
 }

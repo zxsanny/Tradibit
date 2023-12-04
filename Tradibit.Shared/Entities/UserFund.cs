@@ -1,4 +1,5 @@
-﻿using Tradibit.SharedUI.DTO;
+﻿using Tradibit.Shared.DTO;
+using Tradibit.SharedUI.DTO;
 
 namespace Tradibit.Shared.Entities;
 

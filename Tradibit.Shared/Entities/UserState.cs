@@ -1,5 +1,6 @@
-﻿using Tradibit.SharedUI.DTO;
-using Tradibit.SharedUI.DTO.Primitives;
+﻿using Tradibit.Shared.DTO;
+using Tradibit.Shared.DTO.Primitives;
+using Tradibit.SharedUI.DTO;
 
 namespace Tradibit.Shared.Entities;
 
@@ -12,15 +13,15 @@ public class UserState : BaseTrackableId
 
 public class ActivePair
 {
-    public Pair Pair { get; set; }
+    public PairInterval PairInterval { get; set; }
     public decimal Amount { get; set; }
 
     //for ef-core
     public ActivePair(){}
     
-    public ActivePair(Pair pair, decimal amount)
+    public ActivePair(PairInterval pairInterval, decimal amount)
     {
-        Pair = pair;
+        PairInterval = pairInterval;
         Amount = amount;
     }
 }
