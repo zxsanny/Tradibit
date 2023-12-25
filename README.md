@@ -11,6 +11,8 @@
   ```shell 
   TradibitAesKey 
   TradibitAesIv 
+  echo 'export AuthConfig__JwtSecret=dfskjhgb_sfvb_dkfhvbd1ihfbvdkuhfbdhfbkuhgoyeggkueiughliguhpofoishzk' >>~/.bash_profile
+  source ~/.bash-profile
   ```
 2. Database:
  - Add psql's folder to PATH, and run initial.sql for create db and user. But use 'grant all' only for dev's dbs:

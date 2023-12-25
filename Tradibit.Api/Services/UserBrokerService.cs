@@ -34,7 +34,7 @@ public class UserBrokerService :
     {
         var client = await _clientHolder.GetClient(request.UserId, cancellationToken);
         var result = await client.SpotApi.Account.GetBalancesAsync(asset: request.Asset, ct: cancellationToken);
-        return result.Data.ToDictionary(x => new Currency(x.Asset), x => x.BtcValuation);
+        return result.Data.ToDictionary(x => (Currency)x.Asset, x => x.BtcValuation);
     }
     
     #region Simple BUY SELL operations

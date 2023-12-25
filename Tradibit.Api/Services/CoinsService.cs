@@ -27,7 +27,7 @@ public class CoinsService : IRequestHandler<GetMostCapCoinsRequest, List<Pair>>
             .Where(x => !Constants.ExcludedCurrencies.Contains(x.BaseAsset))
             .OrderByDescending(x => x.CirculatingSupply * x.ClosePrice)
             .Take(_mainTradingSettings.NumberPairsProcess)
-            .Select(x => new Pair(x.BaseAsset, x.QuoteAsset))
+            .Select(x => new Pair { BaseCurrency = x.BaseAsset, QuoteCurrency = x.QuoteAsset })
             .ToList();   
     }
 }

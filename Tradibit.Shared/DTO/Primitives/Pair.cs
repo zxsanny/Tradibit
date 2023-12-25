@@ -2,34 +2,26 @@
 
 public class Pair : IEquatable<Pair>
 {
-    private const string Separator = "";
+    private const string SEPARATOR = "";
 
-    public readonly Currency BaseCurrency;
-    public readonly Currency QuoteCurrency;
+    public Currency BaseCurrency { get; set; }
+    public Currency QuoteCurrency { get; set; }
 
-    //for ef-core
-    public Pair(){}
-    
-    public Pair(string baseCurrency, string quoteCurrency) : 
-        this(new Currency(baseCurrency), new Currency(quoteCurrency)) { }
-
-    public Pair(Currency baseCurrency, Currency quoteCurrency)
-    {
-        BaseCurrency = baseCurrency;
-        QuoteCurrency = quoteCurrency;
-    }
-
-    public override string ToString() => $"{BaseCurrency}{Separator}{QuoteCurrency}";
+    public override string ToString() => $"{BaseCurrency}{SEPARATOR}{QuoteCurrency}";
 
     public static Pair Parse(string input) 
     {
-        var strings = input.Split(Separator);
+        var strings = input.Split(SEPARATOR);
         if (strings.Length != 2 
             || strings[0].Length < 2 || strings[0].Length > 7
             || strings[1].Length < 2 || strings[1].Length > 7)
             throw new Exception("Can't parse pair");
-        
-        return new Pair(strings[0], strings[1]);
+
+        return new Pair
+        {
+            BaseCurrency =  strings[0],
+            QuoteCurrency = strings[1]
+        };
     }
     
     public static bool operator ==(Pair? pair1, Pair? pair2)
@@ -62,22 +54,21 @@ public class Pair : IEquatable<Pair>
         return HashCode.Combine(BaseCurrency, QuoteCurrency);
     }
 
-    public static readonly Pair BTC_USDT = new(Currency.BTC, Currency.USDT);
+    public static readonly Pair BTC_USDT = new() { BaseCurrency = Currency.BTC, QuoteCurrency = Currency.USDT };
 }
 
 public class Currency : IEquatable<Currency>
 {
-    private string Value { get; }
-    
-    //for ef-core
-    public Currency(){}
-    
-    public Currency(string value)
+    public string Value { get; set; }
+
+    public static implicit operator Currency(string value)
     {
         if (string.IsNullOrEmpty(value)) throw new Exception("Currency name should not be empty!");
         if (value.Length > 8) throw new Exception("Max lenght of currency name is 7 symbols");
-
-        Value = value;
+        return new Currency
+        {
+            Value = value
+        };
     }
 
     public override string ToString() => Value;
@@ -105,7 +96,7 @@ public class Currency : IEquatable<Currency>
     public static implicit operator string(Currency currency) => 
         currency.Value;
 
-    public static readonly Currency USDT = new("USDT");
-    public static readonly Currency BTC = new("BTC");
-    public static Currency ETH = new("ETH");
+    public static readonly Currency USDT = "USDT";
+    public static readonly Currency BTC = "BTC";
+    public static Currency ETH = "ETH";
 }

@@ -1,18 +1,17 @@
 using System.Text;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Tradibit.Api.Services;
 using Tradibit.DataAccess;
-using Tradibit.Shared;
 using Tradibit.Shared.DTO;
 using Tradibit.Shared.DTO.Auth;
 using Tradibit.Shared.DTO.SettingsDTO;
 using Tradibit.Shared.Extensions;
 using Tradibit.Shared.Interfaces;
 using Tradibit.Shared.MappingProfiles;
-using Tradibit.SharedUI;
 using Tradibit.SharedUI.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,20 +49,11 @@ builder.Services
     });
 
 var authConfig = builder.Configuration.GetSection<AuthConfig>();
-if (string.IsNullOrEmpty(authConfig.ClientId) || string.IsNullOrEmpty(authConfig.ClientSecret) || string.IsNullOrEmpty(authConfig.JwtSecret))
+if (string.IsNullOrEmpty(authConfig.JwtSecret))
     throw new Exception("Please ensure AuthConfig:ClientId and ClientSecret are presented in appsettings.json ");
 
 builder.Services
-    .AddAuthentication(o => o.DefaultScheme = Constants.APP_AUTH_SCHEME)
-    .AddCookie(Constants.APP_AUTH_SCHEME, o => o.ExpireTimeSpan = TimeSpan.FromSeconds(authConfig.TokenExpireSeconds))
-    .AddGoogle(o =>
-    {
-        o.SignInScheme = Constants.APP_AUTH_SCHEME;
-        o.ClientId = authConfig.ClientId;
-        o.ClientSecret = authConfig.ClientSecret;
-        o.CorrelationCookie.SameSite = SameSiteMode.Lax;
-        o.CorrelationCookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-    })
+    .AddAuthentication(o => o.DefaultScheme = JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(o =>
     {
         o.RequireHttpsMetadata = false;
@@ -95,14 +85,10 @@ else
 
 app.UseHttpsRedirection();
 
-app.UseBlazorFrameworkFiles();
-app.UseStaticFiles();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseRouting();
-
 
 app.MapRazorPages();
 app.MapControllers();

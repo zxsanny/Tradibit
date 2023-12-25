@@ -29,5 +29,9 @@
     <ProjectReference Include="..\Tradibit.DataAccess\Tradibit.DataAccess.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\Error.cshtml" />
+  </ItemGroup>
+
 
 </Project>

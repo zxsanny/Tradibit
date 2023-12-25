@@ -6,10 +6,10 @@ namespace Tradibit.Shared.DTO.UserBroker;
 public abstract class BaseOrderEvent : IRequest<decimal>
 {
     public Guid UserId { get; set; }
-    public Pair? Pair { get; set; }
+    public Pair Pair { get; set; }
     public decimal Amount { get; set; }
 
-    protected BaseOrderEvent(Guid userId, Pair? pair, decimal amount)
+    protected BaseOrderEvent(Guid userId, Pair pair, decimal amount)
     {
         UserId = userId;
         Pair = pair;

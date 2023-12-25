@@ -51,7 +51,9 @@ public class ClientHolder : IClientHolder
 
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<TradibitDb>();
-        var user = await db.Users.FindAsync(userId, cancellationToken); 
+        var user = await db.Users.FindAsync(userId, cancellationToken);
+        if (user == null)
+            throw new Exception($"There is no User found by Id {userId}");
         
         client = getClientFunc(user);
         clientsStore.TryAdd(userId, client);
